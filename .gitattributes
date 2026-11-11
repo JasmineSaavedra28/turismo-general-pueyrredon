@@ -1,0 +1,13 @@
+# Normalizar finales de línea para que el repo se comporte igual en Windows, macOS y Linux
+* text=auto eol=lf
+
+# Imágenes y binarios: sin conversión
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+
+# Archivos de datos: preservar tal cual
+*.csv text eol=lf
+*.sql text eol=lf
