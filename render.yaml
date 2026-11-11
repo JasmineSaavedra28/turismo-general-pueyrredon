@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: turismo-general-pueyrredon
+    runtime: python
+    plan: free
+    buildCommand: >-
+      pip install -r requirements.txt &&
+      python scripts/cargar_csv.py &&
+      python scripts/seed_fasta.py &&
+      python scripts/2_descriptiva.py &&
+      python scripts/3_regresion.py
+    startCommand: gunicorn --bind 0.0.0.0:$PORT app:app
+    healthCheckPath: /
+    autoDeploy: true

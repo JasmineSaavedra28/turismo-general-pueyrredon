@@ -5,3 +5,6 @@ numpy==2.5.4
 pandas==3.1.1
 matplotlib==3.11.2
 seaborn==0.13.2
+
+# Servidor WSGI para producción (Render/Linux). En Windows se omite.
+gunicorn==23.0.0; sys_platform != "win32"

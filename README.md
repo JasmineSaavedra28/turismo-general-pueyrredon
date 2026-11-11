@@ -16,7 +16,7 @@
 | **Ciclo lectivo** | 2026 |
 | **Entrega** | Noviembre de 2026 |
 
-![Python](https://img.shields.io/badge/Python-3.11%2B-0b2a4a?logo=python&logoColor=f2c14e)
+![Python](https://img.shields.io/badge/Python-3.12%2B-0b2a4a?logo=python&logoColor=f2c14e)
 ![Flask](https://img.shields.io/badge/Flask-3.1-0b2a4a?logo=flask&logoColor=white)
 ![SQLite](https://img.shields.io/badge/SQLite-3-1b8a8f?logo=sqlite&logoColor=white)
 ![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-7952b3?logo=bootstrap&logoColor=white)
@@ -38,8 +38,9 @@
 10. [Visualizaciones](#10-visualizaciones)
 11. [Decisiones metodológicas y limitaciones](#11-decisiones-metodológicas-y-limitaciones)
 12. [Publicación en GitHub](#12-publicación-en-github)
-13. [Referencias](#13-referencias)
-14. [Autoría](#14-autoría)
+13. [Publicación en línea (Render)](#13-publicación-en-línea-render)
+14. [Referencias](#14-referencias)
+15. [Autoría](#15-autoría)
 
 ---
 
@@ -454,7 +455,7 @@ La API valida que el valor sea numérico, finito, no negativo y menor o igual a 
 
 ### Requisitos
 
-- Python 3.11 o superior. En Windows, instalarlo desde [python.org](https://www.python.org/downloads/windows/) y marcar la opción **“Add python.exe to PATH”** durante la instalación.
+- Python 3.12 o superior. En Windows, instalarlo desde [python.org](https://www.python.org/downloads/windows/) y marcar la opción **“Add python.exe to PATH”** durante la instalación.
 - Git (opcional, para clonar el repositorio).
 - Conexión a Internet para cargar Bootstrap, FontAwesome, Chart.js y MathJax desde CDN.
 
@@ -617,25 +618,84 @@ Resultado esperado: `2.0221 + 0.4977 × 7 = 5.5060` noches.
 
 ## 12. Publicación en GitHub
 
-El repositorio está preparado para publicarse sin incluir el entorno virtual ni la base generada. Desde la carpeta del proyecto:
+El repositorio público del proyecto es:
 
-```bash
-git init -b main
+**https://github.com/JasmineSaavedra28/turismo-general-pueyrredon**
+
+El entorno virtual y la base generada no se versionan. Para subir cambios desde la carpeta del proyecto:
+
+```powershell
 git add .
-git commit -m "TP Final Estadística: Observatorio Turístico de General Pueyrredón"
-git remote add origin https://github.com/<usuario>/<repositorio>.git
-git push -u origin main
+git commit -m "Descripción breve del cambio"
+git push
 ```
 
-Si el repositorio remoto ya existe y tiene otro historial:
+Cada `push` a la rama `main` actualiza el repositorio y, si está activada la opción de despliegue automático, también la versión pública.
 
-```bash
-git branch -M main
-git push -u origin main --force-with-lease
-```
 ---
 
-## 13. Referencias
+## 13. Publicación en línea (Render)
+
+Render permite publicar la aplicación Flask de forma gratuita y conectada a GitHub, para que la profesora acceda desde un enlace sin depender de tu computadora.
+
+### Pasos
+
+1. Crear una cuenta en [render.com](https://render.com) usando la cuenta de GitHub.
+2. Entrar a **New + → Blueprint**.
+3. Seleccionar el repositorio **`JasmineSaavedra28/turismo-general-pueyrredon`**.
+4. Render detecta el archivo `render.yaml` y propone el servicio con su build y start command.
+5. Confirmar con **Apply** y esperar a que termine el build.
+6. Copiar la URL pública, con un formato similar a:
+
+```text
+https://turismo-general-pueyrredon.onrender.com
+```
+
+También se puede crear como **New + → Web Service**, eligiendo el repositorio y usando:
+
+| Campo | Valor |
+|---|---|
+| Runtime | Python |
+| Build Command | `pip install -r requirements.txt && python scripts/cargar_csv.py && python scripts/seed_fasta.py && python scripts/2_descriptiva.py && python scripts/3_regresion.py` |
+| Start Command | `gunicorn --bind 0.0.0.0:$PORT app:app` |
+| Plan | Free |
+
+### Qué hace el despliegue
+
+- Instala las dependencias de `requirements.txt`.
+- Ejecuta el pipeline completo para generar `db/turismo_mdp.db` y los PNG.
+- Levanta la app con **Gunicorn**, el servidor WSGI de producción.
+- Usa Python **3.13.7**, fijado en `.python-version`.
+
+El archivo `render.yaml` ya contiene esta configuración, y `Procfile` deja la misma orden de arranque para otras plataformas compatibles.
+
+### Consideraciones del plan gratuito
+
+- El servicio se suspende después de unos minutos sin visitas.
+- La primera visita luego de la suspensión puede tardar entre 30 y 60 segundos; las siguientes son rápidas.
+- La base SQLite se genera durante el build y queda disponible para la aplicación.
+- Si se modifican los CSV, los scripts o las plantillas, hay que hacer `git push` para volver a desplegar.
+
+### Alternativa para una demo inmediata
+
+Si la profesora necesita verla en el momento y no querés esperar el despliegue, se puede usar un túnel temporal desde tu PC:
+
+```powershell
+winget install --id Cloudflare.cloudflared
+.\.venv\Scripts\python.exe app.py
+```
+
+En otra terminal:
+
+```powershell
+cloudflared tunnel --url http://127.0.0.1:5000
+```
+
+Cloudflare imprime una URL `https://...trycloudflare.com` que funciona mientras tu PC y el servidor estén encendidos. No es un enlace permanente: para la entrega conviene Render.
+
+---
+
+## 14. Referencias
 
 1. **Observatorio Universitario de la Ciudad – Universidad FASTA (2025).** *Perfil y Comportamiento de los Turistas. Análisis comparativo Temporada de Verano 2022–2025.* Mar del Plata.
 2. **Saavedra Piñeiro, Jazmín del Rosario; Gensollen, Bianca; Molteni, Luciano (2024).** *Cuadro Sintético del Análisis Socio-Técnico de un Proyecto de Big Data en el Turismo en Mar del Plata.* ISFT N°151.
@@ -647,7 +707,7 @@ git push -u origin main --force-with-lease
 
 ---
 
-## 14. Autoría
+## 15. Autoría
 
 **Saavedra Piñeiro, Jazmín del Rosario**  
 Estudiante de la Tecnicatura Superior en Análisis de Sistemas  
