@@ -121,7 +121,7 @@ Para este trabajo se construyó una **muestra sintética reproducible de 100 mic
 | Otros medios | 13 registros (13,0 %) | 13,3 % |
 | Reservas con menos de 7 días | 17 registros (17,0 %) | 17,3 % |
 
-Las diferencias de una décima son propias de trabajar con 100 registros enteros: los porcentajes del informe original se redondean a la unidad al construir la muestra. La semilla fija `2025` garantiza que cualquier persona que ejecute `seed_fasta.py` obtenga exactamente los mismos datos.
+Las diferencias de una décima son propias de trabajar con 100 registros enteros: los porcentajes del informe original se redondean a la unidad al construir la muestra. La semilla fija `2025` garantiza que cualquier persona que ejecute `scripts/seed_fasta.py` obtenga exactamente los mismos datos.
 
 ---
 
@@ -129,16 +129,24 @@ Las diferencias de una décima son propias de trabajar con 100 registros enteros
 
 ```text
 turismo/
-├── app.py                          # Aplicación Flask, rutas, filtros y API /predict
-├── analytics.py                    # Núcleo de consultas y cálculos compartidos
-├── cargar_csv.py                   # ETL de los CSV municipales hacia SQLite
-├── seed_fasta.py                   # Generación calibrada de los 100 microdatos
-├── 2_descriptiva.py                # Cálculos descriptivos y gráficos PNG
-├── 3_regresion.py                  # Cálculos de regresión y gráfico PNG
-├── 1_schema.sql                    # Esquema de la base SQLite
+├── app.py                          # Punto de entrada Flask, rutas y API /predict
 ├── requirements.txt                # Dependencias de Python
 ├── .gitignore
+├── .gitattributes
 ├── README.md
+├── core/
+│   ├── __init__.py
+│   └── analytics.py                # Núcleo de consultas y cálculos compartidos
+├── scripts/
+│   ├── cargar_csv.py               # ETL de los CSV municipales hacia SQLite
+│   ├── seed_fasta.py               # Generación calibrada de los 100 microdatos
+│   ├── 2_descriptiva.py            # Cálculos descriptivos y gráficos PNG
+│   └── 3_regresion.py              # Cálculos de regresión y gráfico PNG
+├── db/
+│   ├── 1_schema.sql                # Esquema de la base SQLite
+│   └── turismo_mdp.db              # Base generada (excluida de Git)
+├── docs/
+│   └── TP_Final_Estadistica_Turismo_Sostenible.md
 ├── data/
 │   ├── Procedencia_turistas_2022.csv
 │   ├── Procedencia_turistas_2023.csv
@@ -162,13 +170,13 @@ turismo/
 ### Flujo de datos
 
 ```text
-CSV municipales ──► cargar_csv.py ──┐
-                                    ├──► turismo_mdp.db ──► analytics.py ──► app.py ──► navegador
-seed_fasta.py ──────────────────────┘                          │
-                                                               └──► 2_descriptiva.py / 3_regresion.py ──► PNG
+CSV municipales ──► scripts/cargar_csv.py ──┐
+                                            ├──► db/turismo_mdp.db ──► core/analytics.py ──► app.py ──► navegador
+scripts/seed_fasta.py ──────────────────────┘                                  │
+                                                                               └──► scripts/2_descriptiva.py / scripts/3_regresion.py ──► PNG
 ```
 
-`analytics.py` centraliza la conexión a SQLite y todas las fórmulas. De este modo, los scripts de consola, los gráficos y la aplicación web muestran exactamente los mismos resultados y no hay cálculos duplicados.
+`core/analytics.py` centraliza la conexión a SQLite y todas las fórmulas. De este modo, los scripts de consola, los gráficos y la aplicación web muestran exactamente los mismos resultados y no hay cálculos duplicados.
 
 ---
 
@@ -460,12 +468,12 @@ py -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 
-python cargar_csv.py
-python seed_fasta.py
-python 2_descriptiva.py
-python 3_regresion.py
+py scripts/cargar_csv.py
+py scripts/seed_fasta.py
+py scripts/2_descriptiva.py
+py scripts/3_regresion.py
 
-python app.py
+py app.py
 ```
 
 Si PowerShell bloquea la activación del entorno virtual:
@@ -485,31 +493,31 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 
-python cargar_csv.py
-python seed_fasta.py
-python 2_descriptiva.py
-python 3_regresion.py
+python3 scripts/cargar_csv.py
+python3 scripts/seed_fasta.py
+python3 scripts/2_descriptiva.py
+python3 scripts/3_regresion.py
 
-python app.py
+python3 app.py
 ```
 
 Abrir en el navegador: **http://127.0.0.1:5000**
 
 ### Orden del pipeline
 
-1. `cargar_csv.py`: lee `data/Procedencia_turistas_*.csv`, valida columnas y carga la tabla `procedencia_muni`.
-2. `seed_fasta.py`: crea la tabla `encuestas_fasta` y genera los 100 microdatos calibrados.
-3. `2_descriptiva.py`: calcula la tabla de frecuencias, las medidas y genera `boxplot_estadia.png` y `procedencia_comparativa.png`.
-4. `3_regresion.py`: calcula la regresión y genera `regresion_lineal.png`.
+1. `scripts/cargar_csv.py`: lee `data/Procedencia_turistas_*.csv`, valida columnas y carga la tabla `procedencia_muni`.
+2. `scripts/seed_fasta.py`: crea la tabla `encuestas_fasta` y genera los 100 microdatos calibrados.
+3. `scripts/2_descriptiva.py`: calcula la tabla de frecuencias, las medidas y genera `boxplot_estadia.png` y `procedencia_comparativa.png`.
+4. `scripts/3_regresion.py`: calcula la regresión y genera `regresion_lineal.png`.
 5. `app.py`: levanta el servidor Flask.
 
-> Los scripts crean la base `turismo_mdp.db` automáticamente. El archivo está excluido por `.gitignore` porque es un artefacto generado.
+> Los scripts crean `db/turismo_mdp.db` automáticamente. El archivo está excluido por `.gitignore` porque es un artefacto generado.
 
 ---
 
 ## 9. Reproducibilidad y controles
 
-La semilla `2025` de `seed_fasta.py` fija todos los valores aleatorios. Al ejecutar el pipeline se obtienen estos controles:
+La semilla `2025` de `scripts/seed_fasta.py` fija todos los valores aleatorios. Al ejecutar el pipeline se obtienen estos controles:
 
 ```text
 Edad promedio:          36.80 años
@@ -578,7 +586,7 @@ Resultado esperado: `2.0221 + 0.4977 × 7 = 5.5060` noches.
 ## 11. Decisiones metodológicas y limitaciones
 
 1. **Dos recortes de datos.** El módulo descriptivo usa una submuestra de control de 50 registros agrupados; el módulo de regresión usa la tabla bivariada consolidada de 15 observaciones. Son las tablas que sostienen los resultados publicados en el informe y no deben mezclarse.
-2. **Microdatos calibrados.** Los 100 registros de `seed_fasta.py` son sintéticos y reproducibles. No provienen de una encuesta individual identificable: se generaron para respetar medias, distribuciones y estructura de asociación del informe. La aplicación lo indica en sus notas de fuente.
+2. **Microdatos calibrados.** Los 100 registros de `scripts/seed_fasta.py` son sintéticos y reproducibles. No provienen de una encuesta individual identificable: se generaron para respetar medias, distribuciones y estructura de asociación del informe. La aplicación lo indica en sus notas de fuente.
 3. **Datos municipales normalizados.** Los CSV de `data/` contienen una apertura anual por grupo de origen sobre una base de 100.000 visitantes. Los archivos originales del portal se conservan en `data/raw/` para trazabilidad. Las diferencias de redondeo explican que 2023 totalice 99.900.
 4. **Varianza muestral vs. poblacional.** El módulo descriptivo usa varianza muestral con denominador $N-1$. La tabla bivariada de regresión usa varianzas y covarianza con denominador $N$, tal como se presenta en el informe.
 5. **Redondeo del modelo.** La pendiente se redondea a cuatro decimales antes de calcular la ordenada al origen, para reproducir exactamente $a = 2{,}0221$ y la predicción $8{,}9899$ para $X = 14$. Del mismo modo, los cuartiles se redondean a dos decimales antes de calcular el $IQR = 3{,}01$.
@@ -610,7 +618,7 @@ Antes de publicar, verificar que:
 
 - `static/img/` contiene los tres PNG.
 - `data/raw/` conserva los archivos originales.
-- `turismo_mdp.db` y `.venv/` no están versionados.
+- `db/turismo_mdp.db` y `.venv/` no están versionados.
 - El README muestra la ficha académica correcta.
 
 ---

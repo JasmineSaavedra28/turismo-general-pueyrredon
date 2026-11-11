@@ -6,7 +6,7 @@ Lee los tres archivos normalizados de la carpeta ``data``, agrega la columna
 ``procedencia_muni`` de SQLite.
 
 Uso:
-    python cargar_csv.py
+    py scripts/cargar_csv.py
 
 Los archivos originales descargados del portal de datos abiertos se conservan
 en ``data/raw`` para trazabilidad. Los CSV de ``data`` contienen la apertura
@@ -21,9 +21,12 @@ from pathlib import Path
 
 import pandas as pd
 
-from analytics import DB_PATH, asegurar_esquema, conectar
+BASE_DIR = Path(__file__).resolve().parent.parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
 
-BASE_DIR = Path(__file__).resolve().parent
+from core.analytics import DB_PATH, asegurar_esquema, conectar
+
 DATA_DIR = BASE_DIR / "data"
 ANIOS = (2022, 2023, 2024)
 COLUMNAS = [
@@ -164,7 +167,7 @@ def main() -> int:
     porcentajes = tabla.div(tabla.sum(axis=1), axis=0) * 100
     print(porcentajes.round(1).to_string())
 
-    print("\n[OK] Ingesta finalizada. Ahora ejecutá: python seed_fasta.py")
+    print("\n[OK] Ingesta finalizada. Ahora ejecutá: py scripts/seed_fasta.py")
     return 0
 
 

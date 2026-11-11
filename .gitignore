@@ -18,10 +18,10 @@ dist/
 # ---------------------------------------------------------------------------
 # Base de datos generada por los scripts de ingesta
 # ---------------------------------------------------------------------------
-turismo_mdp.db
-turismo_mdp.db-journal
-turismo_mdp.db-wal
-turismo_mdp.db-shm
+db/*.db
+db/*.db-journal
+db/*.db-wal
+db/*.db-shm
 
 # ---------------------------------------------------------------------------
 # Herramientas, editores y sistema operativo

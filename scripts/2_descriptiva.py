@@ -6,7 +6,7 @@ submuestra de control (N = 50), genera el box-plot de la estadía y el gráfico
 comparativo de procedencia por año.
 
 Uso:
-    python 2_descriptiva.py
+    py scripts/2_descriptiva.py
 """
 
 from __future__ import annotations
@@ -22,9 +22,12 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
-from analytics import get_descriptiva, get_resumen_procedencia
+BASE_DIR = Path(__file__).resolve().parent.parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
 
-BASE_DIR = Path(__file__).resolve().parent
+from core.analytics import get_descriptiva, get_resumen_procedencia
+
 IMG_DIR = BASE_DIR / "static" / "img"
 NAVY = "#0b2a4a"
 TEAL = "#1b8a8f"
@@ -255,7 +258,10 @@ def main() -> int:
         resumen = get_resumen_procedencia()
     except Exception as error:  # noqa: BLE001
         print(f"[ERROR] {error}")
-        print("Ejecutá primero: python cargar_csv.py y python seed_fasta.py")
+        print(
+            "Ejecutá primero: py scripts/cargar_csv.py y "
+            "py scripts/seed_fasta.py"
+        )
         return 1
 
     ruta_boxplot = IMG_DIR / "boxplot_estadia.png"

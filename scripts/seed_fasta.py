@@ -18,16 +18,21 @@ intervalos del informe con frecuencias 6, 14, 18, 8 y 4, lo que reproduce por
 datos agrupados: media 5,60; mediana 5,56; Q1 3,93; Q3 6,94 y s² 4,898.
 
 Uso:
-    python seed_fasta.py
+    py scripts/seed_fasta.py
 """
 
 from __future__ import annotations
 
 import sys
+from pathlib import Path
 
 import numpy as np
 
-from analytics import (
+BASE_DIR = Path(__file__).resolve().parent.parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
+
+from core.analytics import (
     CLASES_ESTADIA,
     asegurar_esquema,
     conectar,
@@ -221,7 +226,7 @@ def main() -> int:
             cantidad = int(((control >= limite_inferior) & (control < limite_superior)).sum())
         control_conteos.append(cantidad)
     print(f"\nSubmuestra de control (N = {N_CONTROL}) · frecuencias: {control_conteos}")
-    print("\n[OK] Seed finalizado. Ahora ejecutá: python 2_descriptiva.py")
+    print("\n[OK] Seed finalizado. Ahora ejecutá: py scripts/2_descriptiva.py")
     return 0
 
 

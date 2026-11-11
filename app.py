@@ -9,7 +9,7 @@ Rutas:
     /predict       API POST que devuelve la estadía estimada.
 
 Uso:
-    python app.py
+    py app.py
 """
 
 from __future__ import annotations
@@ -19,7 +19,7 @@ import sqlite3
 
 from flask import Flask, jsonify, render_template, request
 
-import analytics
+from core import analytics
 
 app = Flask(__name__)
 app.json.ensure_ascii = False

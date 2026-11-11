@@ -2,7 +2,7 @@
 Núcleo analítico del proyecto turístico de General Pueyrredón.
 
 Centraliza la conexión a SQLite, las consultas y los cálculos estadísticos
-utilizados por los scripts de la carpeta raíz y por la aplicación Flask.
+utilizados por los scripts de ``scripts/`` y por la aplicación Flask.
 Mantener aquí la lógica evita duplicar fórmulas y garantiza que el dashboard,
 los gráficos y la API de predicción muestren exactamente los mismos resultados.
 """
@@ -14,9 +14,10 @@ import sqlite3
 from pathlib import Path
 from typing import Any
 
-BASE_DIR = Path(__file__).resolve().parent
-DB_PATH = BASE_DIR / "turismo_mdp.db"
-SCHEMA_PATH = BASE_DIR / "1_schema.sql"
+BASE_DIR = Path(__file__).resolve().parent.parent
+DB_DIR = BASE_DIR / "db"
+DB_PATH = DB_DIR / "turismo_mdp.db"
+SCHEMA_PATH = DB_DIR / "1_schema.sql"
 
 # Orden institucional de las categorías de origen.
 ORDEN_GRUPOS = ["AMBA", "CABA", "Resto Bs As", "Interior", "Exterior"]
@@ -55,16 +56,17 @@ def conectar(crear: bool = False) -> sqlite3.Connection:
     """Abre una conexión a la base. Si ``crear`` es True permite crearla."""
     if not crear and not DB_PATH.exists():
         raise FileNotFoundError(
-            "No se encontró turismo_mdp.db. Ejecutá primero: "
-            "python cargar_csv.py y python seed_fasta.py"
+            "No se encontró db/turismo_mdp.db. Ejecutá primero: "
+            "py scripts/cargar_csv.py y py scripts/seed_fasta.py"
         )
+    DB_DIR.mkdir(parents=True, exist_ok=True)
     conexion = sqlite3.connect(DB_PATH)
     conexion.row_factory = sqlite3.Row
     return conexion
 
 
 def asegurar_esquema(conexion: sqlite3.Connection) -> None:
-    """Ejecuta 1_schema.sql para garantizar que existan ambas tablas."""
+    """Ejecuta db/1_schema.sql para garantizar que existan ambas tablas."""
     if not SCHEMA_PATH.exists():
         raise FileNotFoundError(f"No se encontró el esquema: {SCHEMA_PATH}")
     conexion.executescript(SCHEMA_PATH.read_text(encoding="utf-8"))

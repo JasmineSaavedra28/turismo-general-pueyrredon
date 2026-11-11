@@ -7,7 +7,7 @@ tabla bivariada consolidada del informe FASTA (N = 15). Genera el diagrama de
 dispersión con las observaciones agrupadas y la recta ajustada.
 
 Uso:
-    python 3_regresion.py
+    py scripts/3_regresion.py
 """
 
 from __future__ import annotations
@@ -23,9 +23,12 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
-from analytics import get_regresion
+BASE_DIR = Path(__file__).resolve().parent.parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
 
-BASE_DIR = Path(__file__).resolve().parent
+from core.analytics import get_regresion
+
 IMG_DIR = BASE_DIR / "static" / "img"
 NAVY = "#0b2a4a"
 TEAL = "#1b8a8f"
@@ -183,7 +186,10 @@ def main() -> int:
         reg = get_regresion()
     except Exception as error:  # noqa: BLE001
         print(f"[ERROR] {error}")
-        print("Ejecutá primero: python cargar_csv.py y python seed_fasta.py")
+        print(
+            "Ejecutá primero: py scripts/cargar_csv.py y "
+            "py scripts/seed_fasta.py"
+        )
         return 1
 
     ruta = IMG_DIR / "regresion_lineal.png"
