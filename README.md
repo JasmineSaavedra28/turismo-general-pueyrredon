@@ -132,6 +132,9 @@ Las diferencias de una décima son propias de trabajar con 100 registros enteros
 turismo/
 ├── app.py                          # Punto de entrada Flask, rutas y API /predict
 ├── requirements.txt                # Dependencias de Python
+├── render.yaml                     # Configuración de despliegue en Render
+├── Procfile                        # Arranque WSGI para otras plataformas
+├── .python-version                 # Versión de Python del despliegue
 ├── .gitignore
 ├── .gitattributes
 ├── README.md
