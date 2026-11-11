@@ -1,0 +1,427 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio · Observatorio Turístico de General Pueyrredón{% endblock %}
+
+{% block content %}
+<section class="container">
+    <div class="hero reveal">
+        <div class="row align-items-center g-4 g-xl-5">
+            <div class="col-lg-7">
+                <span class="hero-badge">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    TP Final Integrador · Estadística 2026
+                </span>
+                <h1>Turismo que se planifica con <span class="accent">datos</span>, no con intuición.</h1>
+                <p class="hero-lead">
+                    Un observatorio estadístico que cruza los datos abiertos del Municipio de
+                    General Pueyrredón con el relevamiento del Observatorio Universitario de la
+                    Ciudad (UFASTA) para entender quién llega, cuánto se queda y cómo anticipar
+                    la demanda de servicios turísticos.
+                </p>
+                <div class="hero-actions">
+                    <a class="btn btn-sand" href="{{ url_for('procedencia') }}">
+                        Explorar el observatorio
+                        <i class="fa-solid fa-arrow-right ms-1"></i>
+                    </a>
+                    <a class="btn btn-outline-soft" href="{{ url_for('regresion') }}#simulador">
+                        <i class="fa-solid fa-wand-magic-sparkles me-1"></i>
+                        Probar el simulador
+                    </a>
+                </div>
+                <div class="hero-chips" aria-label="Tecnologías del proyecto">
+                    <span class="hero-chip"><i class="fa-brands fa-python me-1"></i>Python</span>
+                    <span class="hero-chip"><i class="fa-solid fa-flask me-1"></i>Flask</span>
+                    <span class="hero-chip"><i class="fa-solid fa-database me-1"></i>SQLite</span>
+                    <span class="hero-chip"><i class="fa-brands fa-bootstrap me-1"></i>Bootstrap 5</span>
+                    <span class="hero-chip"><i class="fa-solid fa-chart-line me-1"></i>Regresión lineal</span>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="hero-panel">
+                    <div class="hero-panel-head">
+                        <div>
+                            <p class="hero-panel-sub">Perfil del visitante</p>
+                            <h2 class="hero-panel-title">Temporada 2025</h2>
+                        </div>
+                        <span class="badge-soft badge-soft--sand">
+                            <i class="fa-solid fa-circle-check"></i> Calibrado
+                        </span>
+                    </div>
+                    <div class="hero-stat-grid">
+                        <div class="hero-stat">
+                            <div class="hero-stat-value">{{ kpis.edad_promedio|n(1) }}</div>
+                            <div class="hero-stat-label">años de edad promedio</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="hero-stat-value">{{ kpis.estadia_promedio|n(1) }}</div>
+                            <div class="hero-stat-label">noches de estadía</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="hero-stat-value">{{ kpis.anticipacion_promedio|n(1) }}</div>
+                            <div class="hero-stat-label">días de anticipación</div>
+                        </div>
+                    </div>
+                    <div class="hero-bars" aria-hidden="true">
+                        <span style="height: 32%"></span>
+                        <span style="height: 46%"></span>
+                        <span style="height: 58%"></span>
+                        <span style="height: 40%"></span>
+                        <span style="height: 67%"></span>
+                        <span style="height: 53%"></span>
+                        <span style="height: 79%"></span>
+                        <span style="height: 62%"></span>
+                        <span style="height: 74%"></span>
+                        <span style="height: 88%"></span>
+                        <span style="height: 70%"></span>
+                        <span style="height: 96%"></span>
+                    </div>
+                    <div class="hero-panel-foot">
+                        <span><i class="fa-solid fa-database me-1"></i>{{ kpis.n }} microdatos analizados</span>
+                        <span>Fuente: UFASTA 2025</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section section-tight">
+    <div class="container">
+        <div class="row g-3">
+            <div class="col-6 col-xl-3 reveal reveal-delay-1">
+                <article class="kpi-card">
+                    <div class="kpi-top">
+                        <span class="kpi-icon kpi-icon--navy"><i class="fa-solid fa-user"></i></span>
+                        <span class="badge-soft badge-soft--navy">N = 100</span>
+                    </div>
+                    <p class="kpi-label">Edad promedio</p>
+                    <p class="kpi-value">{{ kpis.edad_promedio|n(1) }} <span class="kpi-unit">años</span></p>
+                    <p class="kpi-note">Perfil etario del visitante que elige General Pueyrredón.</p>
+                </article>
+            </div>
+            <div class="col-6 col-xl-3 reveal reveal-delay-2">
+                <article class="kpi-card kpi-card--navy">
+                    <div class="kpi-top">
+                        <span class="kpi-icon"><i class="fa-solid fa-moon"></i></span>
+                        <span class="badge-soft">UFASTA 2025</span>
+                    </div>
+                    <p class="kpi-label">Estadía promedio</p>
+                    <p class="kpi-value">{{ kpis.estadia_promedio|n(1) }} <span class="kpi-unit">noches</span></p>
+                    <p class="kpi-note">Una estadía más corta exige servicios urbanos más flexibles.</p>
+                </article>
+            </div>
+            <div class="col-6 col-xl-3 reveal reveal-delay-3">
+                <article class="kpi-card kpi-card--sand">
+                    <div class="kpi-top">
+                        <span class="kpi-icon kpi-icon--sand"><i class="fa-solid fa-location-dot"></i></span>
+                        <span class="badge-soft badge-soft--sand">{{ kpis.ultimo_anio or "—" }}</span>
+                    </div>
+                    <p class="kpi-label">% AMBA</p>
+                    <p class="kpi-value">{{ kpis.pct_amba|pct(1) }}</p>
+                    <p class="kpi-note">GBA + CABA sobre el total de visitantes del último año.</p>
+                </article>
+            </div>
+            <div class="col-6 col-xl-3 reveal">
+                <article class="kpi-card kpi-card--coral">
+                    <div class="kpi-top">
+                        <span class="kpi-icon kpi-icon--coral"><i class="fa-solid fa-house-chimney"></i></span>
+                        <span class="badge-soft badge-soft--coral">75 %</span>
+                    </div>
+                    <p class="kpi-label">Alquiler de depto./casa</p>
+                    <p class="kpi-value">{{ kpis.pct_alquiler|pct(1) }}</p>
+                    <p class="kpi-note">Consolidación del turismo extrahotelero y de plataformas digitales.</p>
+                </article>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="row align-items-end g-3 mb-4">
+            <div class="col-lg-8">
+                <span class="eyebrow">Marco socio-técnico</span>
+                <h2 class="section-title">Un tablero para decidir con evidencia</h2>
+                <p class="section-lead">
+                    El proyecto articula datos administrativos, encuestas de percepción y modelos
+                    estadísticos en una arquitectura web reproducible. El objetivo no es solo
+                    describir el turismo: es convertir la información en insumos para la gestión
+                    sostenible del destino.
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <span class="badge-soft"><i class="fa-solid fa-seedling"></i> Plan Mar del Plata 2050 · Red DTI-Ar</span>
+            </div>
+        </div>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <article class="feature-card h-100">
+                    <span class="feature-icon"><i class="fa-solid fa-map-location-dot"></i></span>
+                    <h3>Datos abiertos que cuentan historias</h3>
+                    <p>
+                        La procedencia geográfica de los visitantes entre 2022 y 2024 permite leer
+                        la recuperación del turismo y el avance de nuevos mercados emisores.
+                    </p>
+                    <a class="feature-link" href="{{ url_for('procedencia') }}">
+                        Ver evolución <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </article>
+            </div>
+            <div class="col-md-4">
+                <article class="feature-card h-100">
+                    <span class="feature-icon feature-icon--sand"><i class="fa-solid fa-microphone-lines"></i></span>
+                    <h3>La voz del visitante</h3>
+                    <p>
+                        El Observatorio UFASTA aporta el perfil de consumo: edad, estadía,
+                        anticipación, alojamiento y transporte de la temporada 2025.
+                    </p>
+                    <a class="feature-link" href="{{ url_for('descriptiva') }}">
+                        Analizar la muestra <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </article>
+            </div>
+            <div class="col-md-4">
+                <article class="feature-card h-100">
+                    <span class="feature-icon feature-icon--coral"><i class="fa-solid fa-chart-line"></i></span>
+                    <h3>Un modelo para anticipar la demanda</h3>
+                    <p>
+                        La regresión lineal entre días de anticipación y noches de estadía ofrece
+                        una herramienta simple para dimensionar servicios y promociones.
+                    </p>
+                    <a class="feature-link" href="{{ url_for('regresion') }}">
+                        Explorar el modelo <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </article>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-tight">
+    <div class="container">
+        <div class="panel">
+            <div class="panel-head">
+                <div>
+                    <h2 class="panel-title"><i class="fa-solid fa-diagram-project me-2 text-teal"></i>Arquitectura del flujo de datos</h2>
+                    <p class="panel-sub">Del CSV municipal al tablero interactivo, sin planillas intermedias.</p>
+                </div>
+                <span class="badge-soft"><i class="fa-solid fa-rotate"></i> Pipeline reproducible</span>
+            </div>
+            <div class="panel-body">
+                <div class="flow" aria-label="Etapas del pipeline de datos">
+                    <div class="flow-step">
+                        <i class="fa-solid fa-file-csv"></i>
+                        <strong>1. Fuentes</strong>
+                        <span>CSV municipal + UFASTA</span>
+                    </div>
+                    <span class="flow-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                    <div class="flow-step">
+                        <i class="fa-solid fa-broom"></i>
+                        <strong>2. ETL</strong>
+                        <span>Limpieza y calibración</span>
+                    </div>
+                    <span class="flow-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                    <div class="flow-step">
+                        <i class="fa-solid fa-database"></i>
+                        <strong>3. SQLite</strong>
+                        <span>Dos tablas analíticas</span>
+                    </div>
+                    <span class="flow-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                    <div class="flow-step">
+                        <i class="fa-solid fa-flask"></i>
+                        <strong>4. Flask</strong>
+                        <span>Rutas y API /predict</span>
+                    </div>
+                    <span class="flow-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                    <div class="flow-step">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <strong>5. Dashboard</strong>
+                        <span>KPIs y simulador</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="row g-4 align-items-stretch">
+            <div class="col-lg-5">
+                <span class="eyebrow">Perfil del visitante</span>
+                <h2 class="section-title">¿Dónde se aloja y cómo llega?</h2>
+                <p class="section-lead mb-3">
+                    La distribución categórica confirma un destino dominado por el alquiler
+                    extrahotelero y el auto particular. Ese perfil tiene consecuencias directas
+                    sobre la movilidad, la recolección de residuos y la fiscalización urbana.
+                </p>
+                <ul class="list-check">
+                    <li>75 % elige casas o departamentos alquilados.</li>
+                    <li>57 % arriba en auto particular.</li>
+                    <li>El 88,2 % de quienes reservan con menos de 7 días alquila depto./casa.</li>
+                </ul>
+                <a class="btn btn-soft btn-sm mt-2" href="{{ url_for('descriptiva') }}">
+                    Ver análisis completo <i class="fa-solid fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+            <div class="col-lg-7">
+                <div class="row g-3 h-100">
+                    <div class="col-md-6">
+                        <div class="panel h-100">
+                            <div class="panel-head">
+                                <div>
+                                    <h3 class="panel-title">Alojamiento</h3>
+                                    <p class="panel-sub">N = 100 · UFASTA 2025</p>
+                                </div>
+                                <span class="kpi-icon kpi-icon--sand"><i class="fa-solid fa-bed"></i></span>
+                            </div>
+                            <div class="panel-body">
+                                {% for item in distribuciones.alojamiento %}
+                                <div class="dist-row">
+                                    <div class="dist-label">
+                                        <span>{{ item.label }}</span>
+                                        <span>{{ item.pct|n(1) }} %</span>
+                                    </div>
+                                    <div class="dist-track">
+                                        <div class="dist-fill {% if loop.index == 1 %}{% elif loop.index == 2 %}dist-fill--navy{% else %}dist-fill--sand{% endif %}" style="width: {{ item.pct }}%"></div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="panel h-100">
+                            <div class="panel-head">
+                                <div>
+                                    <h3 class="panel-title">Transporte</h3>
+                                    <p class="panel-sub">N = 100 · UFASTA 2025</p>
+                                </div>
+                                <span class="kpi-icon"><i class="fa-solid fa-car-side"></i></span>
+                            </div>
+                            <div class="panel-body">
+                                {% for item in distribuciones.transporte %}
+                                <div class="dist-row">
+                                    <div class="dist-label">
+                                        <span>{{ item.label }}</span>
+                                        <span>{{ item.pct|n(1) }} %</span>
+                                    </div>
+                                    <div class="dist-track">
+                                        <div class="dist-fill {% if loop.index == 1 %}{% elif loop.index == 2 %}dist-fill--sand{% else %}dist-fill--coral{% endif %}" style="width: {{ item.pct }}%"></div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                                <div class="note-box note-box--sand mt-3 py-2 px-3">
+                                    <i class="fa-solid fa-circle-info me-1"></i>
+                                    El auto particular concentra la mayoría de los arribos y presiona
+                                    sobre el estacionamiento y los accesos costeros.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="row align-items-end g-3 mb-4">
+            <div class="col-lg-8">
+                <span class="eyebrow">Accesos directos</span>
+                <h2 class="section-title">Tres recorridos por los datos</h2>
+                <p class="section-lead">
+                    Cada módulo combina una pregunta de gestión con una técnica estadística
+                    concreta y una visualización pensada para comunicar resultados.
+                </p>
+            </div>
+        </div>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <a class="access-card" href="{{ url_for('procedencia') }}">
+                    <span class="access-arrow"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+                    <span class="access-icon"><i class="fa-solid fa-map-location-dot"></i></span>
+                    <h3>Procedencia</h3>
+                    <p>Comparativa 2022-2024 de AMBA, CABA, Resto de Buenos Aires e Interior.</p>
+                    <span class="badge-soft">Datos abiertos municipales</span>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a class="access-card" href="{{ url_for('descriptiva') }}">
+                    <span class="access-arrow"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+                    <span class="access-icon access-icon--teal"><i class="fa-solid fa-chart-simple"></i></span>
+                    <h3>Descriptiva</h3>
+                    <p>Frecuencias agrupadas, medidas de resumen, box-plot y probabilidades.</p>
+                    <span class="badge-soft">N = 50 · datos agrupados</span>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a class="access-card" href="{{ url_for('regresion') }}">
+                    <span class="access-arrow"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+                    <span class="access-icon access-icon--sand"><i class="fa-solid fa-chart-line"></i></span>
+                    <h3>Regresión</h3>
+                    <p>Covarianza, correlación, recta de mínimos cuadrados y simulador.</p>
+                    <span class="badge-soft badge-soft--sand">r = 0,8199 · r² = 0,6722</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-tight">
+    <div class="container">
+        <div class="panel">
+            <div class="panel-head">
+                <div>
+                    <h2 class="panel-title"><i class="fa-solid fa-book-open me-2 text-teal"></i>Fuentes, muestra y tratamiento</h2>
+                    <p class="panel-sub">Trazabilidad metodológica del Trabajo Práctico Final Integrador.</p>
+                </div>
+                <span class="badge-soft badge-soft--navy">ISFT N°151 · 2026</span>
+            </div>
+            <div class="panel-body">
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <h3 class="h6 text-navy mb-2">Datos abiertos municipales</h3>
+                        <p class="source-note mb-2">
+                            Porcentajes mensuales de procedencia de turistas 2022-2024 del Municipio
+                            de General Pueyrredón. Se consolidaron en promedios anuales y se
+                            expresaron sobre una base de referencia de 100.000 visitantes por año
+                            (2023: 99.900 por redondeo).
+                        </p>
+                        <span class="badge-soft">3 años · 13 registros</span>
+                    </div>
+                    <div class="col-md-4">
+                        <h3 class="h6 text-navy mb-2">Observatorio UFASTA</h3>
+                        <p class="source-note mb-2">
+                            Informe de verano 2025. Los 100 microdatos se calibraron respetando
+                            medias, distribución categórica y estructura de regresión publicadas.
+                        </p>
+                        <span class="badge-soft badge-soft--sand">N = 100 · 6 variables</span>
+                    </div>
+                    <div class="col-md-4">
+                        <h3 class="h6 text-navy mb-2">Tratamiento estadístico</h3>
+                        <p class="source-note mb-2">
+                            Tabla de frecuencias agrupadas, medidas de tendencia central y
+                            dispersión, probabilidades condicionadas y regresión lineal simple por
+                            mínimos cuadrados.
+                        </p>
+                        <span class="badge-soft badge-soft--coral">Estadística descriptiva e inferencial</span>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                    <p class="small-muted mb-0">
+                        <i class="fa-solid fa-circle-info me-1 text-teal"></i>
+                        Los resultados se presentan con fines académicos y reproducen los parámetros
+                        del informe utilizados en el TP.
+                    </p>
+                    <a class="btn btn-soft btn-sm" href="{{ url_for('regresion') }}#simulador">
+                        Ir al simulador predictivo <i class="fa-solid fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

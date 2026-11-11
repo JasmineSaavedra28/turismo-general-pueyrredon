@@ -1,0 +1,563 @@
+{% extends "base.html" %}
+
+{% block title %}Regresión · Observatorio Turístico{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div class="container">
+        <div class="row align-items-end g-3">
+            <div class="col-lg-9">
+                <span class="hero-badge"><i class="fa-solid fa-chart-line"></i> Módulo 03 · Estadística bivariada</span>
+                <h1>Anticipar la estadía para anticipar la demanda</h1>
+                <p class="lead">
+                    La regresión lineal simple permite estimar cuántas noches se queda un turista
+                    a partir de los días con los que planificó su reserva. El modelo se apoya en
+                    la tabla bivariada consolidada del Observatorio UFASTA.
+                </p>
+            </div>
+            <div class="col-lg-3 text-lg-end">
+                <span class="badge-soft"><i class="fa-solid fa-ruler"></i> N = {{ reg.n }} · tabla FASTA</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="container">
+    <div class="equation-card reveal">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-7">
+                <span class="badge-soft mb-3"><i class="fa-solid fa-square-root-variable"></i> Modelo de mínimos cuadrados</span>
+                <h2>La recta que conecta planificación y estadía</h2>
+                <p class="mb-0">
+                    Cada día adicional de anticipación se asocia, en promedio, con
+                    {{ reg.pendiente|n(4) }} noches más de estadía. El modelo explica el
+                    {{ (reg.determinacion * 100)|n(1) }} % de la variabilidad observada.
+                </p>
+            </div>
+            <div class="col-lg-5">
+                <div class="equation">
+                    \(\hat{Y} = {{ reg.modelo_a }} + {{ reg.modelo_b }}\,X\)
+                </div>
+                <p class="equation-small mb-3">
+                    \(X\): días de anticipación · \(\hat{Y}\): noches de estadía estimadas
+                </p>
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="badge-soft"><i class="fa-solid fa-arrow-trend-up"></i> r = {{ reg.correlacion|n(4) }}</span>
+                    <span class="badge-soft"><i class="fa-solid fa-bullseye"></i> r² = {{ reg.determinacion|n(4) }}</span>
+                    <a class="badge-soft" href="#simulador"><i class="fa-solid fa-wand-magic-sparkles"></i> Simulador</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-tight">
+    <div class="container">
+        <div class="row g-3">
+            <div class="col-6 col-md-4 col-xl">
+                <article class="kpi-card">
+                    <p class="kpi-label">Correlación de Pearson</p>
+                    <p class="kpi-value">{{ reg.correlacion|n(4) }}</p>
+                    <p class="kpi-note">Correlación lineal positiva fuerte.</p>
+                </article>
+            </div>
+            <div class="col-6 col-md-4 col-xl">
+                <article class="kpi-card kpi-card--navy">
+                    <p class="kpi-label">Coeficiente de determinación</p>
+                    <p class="kpi-value">{{ reg.determinacion|n(4) }}</p>
+                    <p class="kpi-note">{{ (reg.determinacion * 100)|n(1) }} % de la variabilidad explicada.</p>
+                </article>
+            </div>
+            <div class="col-6 col-md-4 col-xl">
+                <article class="kpi-card kpi-card--sand">
+                    <p class="kpi-label">Covarianza S<sub>xy</sub></p>
+                    <p class="kpi-value">{{ reg.covarianza|n(2) }}</p>
+                    <p class="kpi-note">Días · noches. Asociación positiva.</p>
+                </article>
+            </div>
+            <div class="col-6 col-md-4 col-xl">
+                <article class="kpi-card kpi-card--coral">
+                    <p class="kpi-label">Pendiente b</p>
+                    <p class="kpi-value">{{ reg.pendiente|n(4) }}</p>
+                    <p class="kpi-note">Noches adicionales por día de anticipación.</p>
+                </article>
+            </div>
+            <div class="col-6 col-md-4 col-xl">
+                <article class="kpi-card">
+                    <p class="kpi-label">Ordenada a</p>
+                    <p class="kpi-value">{{ reg.ordenada|n(4) }}</p>
+                    <p class="kpi-note">Estadía estimada con X = 0.</p>
+                </article>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-tight">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-xl-8">
+                <div class="panel h-100">
+                    <div class="panel-head">
+                        <div>
+                            <h2 class="panel-title">Diagrama de dispersión y recta ajustada</h2>
+                            <p class="panel-sub">15 observaciones agrupadas · el tamaño del círculo indica la frecuencia conjunta.</p>
+                        </div>
+                        <a class="btn btn-soft btn-sm" href="{{ url_for('static', filename='img/regresion_lineal.png') }}" download>
+                            <i class="fa-solid fa-download me-1"></i> PNG
+                        </a>
+                    </div>
+                    <div class="panel-body">
+                        <div class="report-frame">
+                            <img class="img-report"
+                                 src="{{ url_for('static', filename='img/regresion_lineal.png') }}"
+                                 alt="Diagrama de dispersión de días de anticipación y noches de estadía con la recta de regresión ajustada">
+                        </div>
+                    </div>
+                    <div class="panel-foot">
+                        <i class="fa-solid fa-circle-info me-1 text-teal"></i>
+                        La recta se estimó sobre la tabla bivariada consolidada del informe
+                        (N = {{ reg.n }}). Cada punto representa una observación agrupada y el
+                        círculo sintetiza cuántas observaciones comparten la misma combinación
+                        de anticipación y estadía.
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4">
+                <div class="panel h-100">
+                    <div class="panel-head">
+                        <div>
+                            <h2 class="panel-title">Ficha del modelo</h2>
+                            <p class="panel-sub">Parámetros calculados por mínimos cuadrados.</p>
+                        </div>
+                        <span class="badge-soft badge-soft--navy"><i class="fa-solid fa-list-check"></i></span>
+                    </div>
+                    <div class="panel-body">
+                        <div class="metric-grid">
+                            <div class="metric-tile">
+                                <div class="label">Media X</div>
+                                <div class="value">{{ reg.media_x|n(2) }}</div>
+                                <div class="hint">días</div>
+                            </div>
+                            <div class="metric-tile">
+                                <div class="label">Media Y</div>
+                                <div class="value">{{ reg.media_y|n(2) }}</div>
+                                <div class="hint">noches</div>
+                            </div>
+                            <div class="metric-tile">
+                                <div class="label">Desvío X</div>
+                                <div class="value">{{ reg.desvio_x|n(4) }}</div>
+                                <div class="hint">s<sub>x</sub></div>
+                            </div>
+                            <div class="metric-tile">
+                                <div class="label">Desvío Y</div>
+                                <div class="value">{{ reg.desvio_y|n(4) }}</div>
+                                <div class="hint">s<sub>y</sub></div>
+                            </div>
+                            <div class="metric-tile">
+                                <div class="label">Varianza X</div>
+                                <div class="value">{{ reg.varianza_x|n(2) }}</div>
+                                <div class="hint">s<sub>x</sub>²</div>
+                            </div>
+                            <div class="metric-tile">
+                                <div class="label">Varianza Y</div>
+                                <div class="value">{{ reg.varianza_y|n(2) }}</div>
+                                <div class="hint">s<sub>y</sub>²</div>
+                            </div>
+                        </div>
+                        <div class="note-box mt-3">
+                            <i class="fa-solid fa-circle-info me-1"></i>
+                            <strong>Interpretación:</strong> un turista que reserva con 14 días de
+                            anticipación tiene una estadía estimada de
+                            <strong>{{ (reg.modelo_a + reg.modelo_b * 14)|n(2) }} noches</strong>.
+                            El modelo es descriptivo y no debe interpretarse como una relación causal.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-tight">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="panel h-100">
+                    <div class="panel-head">
+                        <div>
+                            <h2 class="panel-title">Tabla bivariada de frecuencias</h2>
+                            <p class="panel-sub">X: días de anticipación · Y: noches de estadía.</p>
+                        </div>
+                        <span class="badge-soft"><i class="fa-solid fa-table-cells"></i> N = {{ reg.n }}</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-clean align-middle">
+                            <thead>
+                                <tr>
+                                    <th scope="col">X \ Y</th>
+                                    {% for y in reg.y_marcas %}
+                                    <th scope="col" class="num">Y = {{ y|n(1) }}</th>
+                                    {% endfor %}
+                                    <th scope="col" class="num">Total X</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for fila in reg.frecuencias %}
+                                {% set fila_idx = loop.index0 %}
+                                <tr>
+                                    <th scope="row" class="fw-semibold text-navy">X = {{ reg.x_marcas[fila_idx]|n(1) }}</th>
+                                    {% for valor in fila %}
+                                    <td class="num">{{ valor }}</td>
+                                    {% endfor %}
+                                    <td class="num fw-semibold">{{ reg.total_x[fila_idx] }}</td>
+                                </tr>
+                                {% endfor %}
+                                <tr class="total-row">
+                                    <td>Total Y</td>
+                                    {% for total in reg.total_y %}
+                                    <td class="num">{{ total }}</td>
+                                    {% endfor %}
+                                    <td class="num">{{ reg.n }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="panel-foot">
+                        <i class="fa-solid fa-circle-info me-1 text-teal"></i>
+                        Las marcas de clase son X = 3; 7,5; 15 y Y = 3; 6; 10. La tabla representa
+                        15 observaciones agrupadas del informe.
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="panel h-100">
+                    <div class="panel-head">
+                        <div>
+                            <h2 class="panel-title">Cálculo paso a paso</h2>
+                            <p class="panel-sub">Covarianza, correlación y recta de regresión.</p>
+                        </div>
+                        <span class="badge-soft badge-soft--sand"><i class="fa-solid fa-calculator"></i></span>
+                    </div>
+                    <div class="panel-body">
+                        <div class="accordion" id="acordeonRegresion">
+                            <div class="accordion-item">
+                                <h3 class="accordion-header">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#pasoCov" aria-expanded="true" aria-controls="pasoCov">
+                                        Covarianza y correlación
+                                    </button>
+                                </h3>
+                                <div id="pasoCov" class="accordion-collapse collapse show" data-bs-parent="#acordeonRegresion">
+                                    <div class="accordion-body">
+                                        <div class="formula mb-2">
+                                            \[
+                                            s_{xy} = \frac{\sum_i \sum_j f_{ij} x_i y_j}{N} - \bar{x}\bar{y}
+                                            = \frac{1.144{,}50}{15} - (9{,}60)(6{,}80) = 11{,}02
+                                            \]
+                                        </div>
+                                        <div class="formula mb-0">
+                                            \[
+                                            r = \frac{s_{xy}}{s_x s_y}
+                                            = \frac{11{,}02}{4{,}7053 \cdot 2{,}8566} = 0{,}8199
+                                            \qquad r^2 = 0{,}6722
+                                            \]
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h3 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#pasoRecta" aria-expanded="false" aria-controls="pasoRecta">
+                                        Pendiente y ordenada al origen
+                                    </button>
+                                </h3>
+                                <div id="pasoRecta" class="accordion-collapse collapse" data-bs-parent="#acordeonRegresion">
+                                    <div class="accordion-body">
+                                        <div class="formula mb-2">
+                                            \[
+                                            b = \frac{s_{xy}}{s_x^2}
+                                            = \frac{11{,}02}{22{,}14} = 0{,}4977
+                                            \]
+                                        </div>
+                                        <div class="formula mb-0">
+                                            \[
+                                            a = \bar{y} - b\bar{x}
+                                            = 6{,}80 - (0{,}4977)(9{,}60) = 2{,}0221
+                                            \]
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h3 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#pasoPred" aria-expanded="false" aria-controls="pasoPred">
+                                        Estimación para 14 días
+                                    </button>
+                                </h3>
+                                <div id="pasoPred" class="accordion-collapse collapse" data-bs-parent="#acordeonRegresion">
+                                    <div class="accordion-body">
+                                        <div class="formula mb-0">
+                                            \[
+                                            \hat{Y} = 2{,}0221 + 0{,}4977(14)
+                                            = 2{,}0221 + 6{,}9678 = 8{,}9899 \approx 9 \text{ noches}
+                                            \]
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="source-note mt-3 mb-0">
+                            <i class="fa-solid fa-circle-info me-1"></i>
+                            En la tabla bivariada, las varianzas y la covarianza se calculan con
+                            denominador \(N\), tal como se presenta en el informe. El módulo
+                            descriptivo usa varianza muestral con denominador \(N-1\).
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-tight" id="simulador">
+    <div class="container">
+        <div class="simulator">
+            <div class="panel-head">
+                <div>
+                    <span class="hero-badge mb-2"><i class="fa-solid fa-wand-magic-sparkles"></i> Simulador interactivo</span>
+                    <h2 class="panel-title">¿Cuántas noches se quedaría?</h2>
+                    <p class="panel-sub">Ingresá los días de anticipación y consultá la estimación del modelo.</p>
+                </div>
+                <span class="badge-soft"><i class="fa-solid fa-code"></i> POST /predict</span>
+            </div>
+            <div class="panel-body">
+                <div class="row g-4 align-items-stretch">
+                    <div class="col-lg-5">
+                        <label for="inputDias" class="form-label">Días de anticipación (X)</label>
+                        <div class="input-group mb-2">
+                            <input type="number" class="form-control" id="inputDias" min="0" max="30" step="1" value="14" inputmode="numeric" aria-describedby="ayudaDias">
+                            <span class="input-group-text">días</span>
+                        </div>
+                        <input type="range" class="form-range mb-2" id="rangoDias" min="0" max="30" step="1" value="14" aria-label="Días de anticipación">
+                        <div class="d-flex justify-content-between small-muted mb-3" id="ayudaDias">
+                            <span>0 días</span>
+                            <span>15 días</span>
+                            <span>30 días</span>
+                        </div>
+                        <button class="btn btn-sand w-100" type="button" id="btnPredecir">
+                            <i class="fa-solid fa-calculator me-1"></i> Estimar estadía
+                        </button>
+                        <p class="result-text mt-3 mb-0" id="estadoApi" role="status" aria-live="polite">
+                            Rango de simulación: 0 a 30 días.
+                        </p>
+                        <p class="source-note mt-2 mb-0">
+                            <i class="fa-solid fa-shield-halved me-1"></i>
+                            La API valida que el valor sea numérico, finito y no negativo.
+                        </p>
+                    </div>
+                    <div class="col-lg-7">
+                        <div class="row g-3 h-100">
+                            <div class="col-md-5">
+                                <div class="result-box">
+                                    <div class="result-kicker">Estadía estimada</div>
+                                    <div class="d-flex align-items-baseline">
+                                        <span class="result-value" id="resultadoEstadia">{{ (reg.modelo_a + reg.modelo_b * 14)|n(2) }}</span>
+                                        <span class="result-unit">noches</span>
+                                    </div>
+                                    <p class="result-text" id="resultadoTexto">
+                                        Para <strong>14 días</strong> de anticipación, el modelo
+                                        estima <strong>{{ (reg.modelo_a + reg.modelo_b * 14)|n(2) }} noches</strong>
+                                        de estadía.
+                                    </p>
+                                    <div class="mt-3">
+                                        <span class="badge-soft"><i class="fa-solid fa-arrow-trend-up"></i> r = {{ reg.correlacion|n(4) }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-7">
+                                <div class="chart-wrap-sm h-100">
+                                    <canvas id="chartSimulador" aria-label="Recta de regresión con la estimación seleccionada" role="img"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+    (() => {
+        const a = {{ reg.modelo_a }};
+        const b = {{ reg.modelo_b }};
+        const input = document.getElementById('inputDias');
+        const rango = document.getElementById('rangoDias');
+        const boton = document.getElementById('btnPredecir');
+        const salida = document.getElementById('resultadoEstadia');
+        const texto = document.getElementById('resultadoTexto');
+        const estado = document.getElementById('estadoApi');
+        const canvas = document.getElementById('chartSimulador');
+        const formato = new Intl.NumberFormat('es-AR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+
+        if (!input || !rango || !boton || !canvas || typeof Chart === 'undefined') return;
+
+        const xs = Array.from({ length: 31 }, (_, indice) => indice);
+        const linea = xs.map((x) => a + b * x);
+
+        const chart = new Chart(canvas, {
+            type: 'line',
+            data: {
+                labels: xs,
+                datasets: [
+                    {
+                        label: 'Recta ajustada',
+                        data: xs.map((x) => ({ x, y: a + b * x })),
+                        borderColor: '#f2c14e',
+                        backgroundColor: 'rgba(242, 193, 78, 0.10)',
+                        borderWidth: 2.6,
+                        pointRadius: 0,
+                        pointHoverRadius: 0,
+                        tension: 0,
+                        fill: true
+                    },
+                    {
+                        type: 'scatter',
+                        label: 'Estimación',
+                        data: [{ x: 14, y: a + b * 14 }],
+                        backgroundColor: '#e76f51',
+                        borderColor: '#ffffff',
+                        borderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        showLine: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'nearest', intersect: false },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: 'rgba(255,255,255,0.72)',
+                            usePointStyle: true,
+                            boxWidth: 8,
+                            padding: 14,
+                            font: { family: 'Inter', size: 10 }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: '#071c33',
+                        padding: 9,
+                        cornerRadius: 7,
+                        callbacks: {
+                            label: (context) => {
+                                if (context.dataset.type === 'scatter') {
+                                    return `Estimación: ${formato.format(context.parsed.y)} noches`;
+                                }
+                                return `X = ${context.parsed.x}: ${formato.format(context.parsed.y)} noches`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'linear',
+                        min: 0,
+                        max: 30,
+                        grid: { color: 'rgba(255,255,255,0.08)' },
+                        ticks: { color: 'rgba(255,255,255,0.6)', font: { family: 'Inter', size: 10 } },
+                        title: {
+                            display: true,
+                            text: 'Días de anticipación',
+                            color: 'rgba(255,255,255,0.55)',
+                            font: { family: 'Inter', size: 10 }
+                        }
+                    },
+                    y: {
+                        min: 0,
+                        max: 15,
+                        grid: { color: 'rgba(255,255,255,0.08)' },
+                        ticks: { color: 'rgba(255,255,255,0.6)', font: { family: 'Inter', size: 10 } },
+                        title: {
+                            display: true,
+                            text: 'Noches de estadía',
+                            color: 'rgba(255,255,255,0.55)',
+                            font: { family: 'Inter', size: 10 }
+                        }
+                    }
+                }
+            }
+        });
+
+        const actualizarResultado = (dias, estimacion) => {
+            salida.textContent = formato.format(estimacion);
+            texto.innerHTML = `Para <strong>${dias} días</strong> de anticipación, el modelo estima <strong>${formato.format(estimacion)} noches</strong> de estadía.`;
+            chart.data.datasets[1].data = [{ x: dias, y: estimacion }];
+            chart.update();
+        };
+
+        const consultar = async (dias) => {
+            const numero = Number(dias);
+            if (!Number.isFinite(numero) || numero < 0 || numero > 30) {
+                estado.textContent = 'Ingresá un número entero entre 0 y 30 días.';
+                estado.classList.add('text-warning');
+                return;
+            }
+
+            boton.disabled = true;
+            estado.classList.remove('text-warning');
+            estado.textContent = 'Consultando el modelo…';
+
+            try {
+                const respuesta = await fetch('/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ dias_anticipacion: numero })
+                });
+                const datos = await respuesta.json();
+                if (!respuesta.ok) throw new Error(datos.error || 'No se pudo estimar la estadía.');
+                actualizarResultado(numero, datos.estadia_estimada);
+                estado.textContent = `Respuesta de /predict · ${datos.modelo}`;
+            } catch (error) {
+                estado.textContent = error.message;
+                estado.classList.add('text-warning');
+            } finally {
+                boton.disabled = false;
+            }
+        };
+
+        let temporizador;
+        rango.addEventListener('input', () => {
+            input.value = rango.value;
+            clearTimeout(temporizador);
+            temporizador = setTimeout(() => consultar(rango.value), 180);
+        });
+
+        input.addEventListener('input', () => {
+            const valor = Number(input.value);
+            if (Number.isFinite(valor) && valor >= 0 && valor <= 30) {
+                rango.value = valor;
+            }
+        });
+
+        boton.addEventListener('click', () => consultar(input.value));
+    })();
+</script>
+<script>
+    window.MathJax = {
+        tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+        svg: { fontCache: 'global' }
+    };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+{% endblock %}

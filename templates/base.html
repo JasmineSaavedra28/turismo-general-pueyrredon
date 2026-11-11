@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Observatorio Turístico de General Pueyrredón: estadística descriptiva, procedencia y modelo predictivo de estadía. TP Final Integrador de Estadística · ISFT N°151.">
+    <meta name="theme-color" content="#0b2a4a">
+    <title>{% block title %}Observatorio Turístico · General Pueyrredón{% endblock %}</title>
+
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230b2a4a'/%3E%3Cpath d='M50 18 L61 44 L87 50 L61 56 L50 82 L39 56 L13 50 L39 44 Z' fill='%23f2c14e'/%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    {% block head %}{% endblock %}
+</head>
+<body>
+<a class="skip-link" href="#contenido">Saltar al contenido principal</a>
+
+<div class="institutional-bar">
+    <div class="container d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <span><i class="fa-solid fa-building-columns me-2"></i>{{ meta.institucion_corta }} · {{ meta.carrera }}</span>
+        <span class="d-none d-md-inline"><i class="fa-regular fa-calendar me-2"></i>{{ meta.materia }} · {{ meta.ciclo }}</span>
+    </div>
+</div>
+
+<nav class="navbar navbar-expand-lg navbar-main sticky-top" aria-label="Navegación principal">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('index') }}">
+            <span class="brand-mark"><i class="fa-solid fa-compass"></i></span>
+            <span class="brand-text">
+                <strong>Observatorio Turístico</strong>
+                <small>General Pueyrredón</small>
+            </span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPrincipal" aria-controls="menuPrincipal" aria-expanded="false" aria-label="Abrir menú">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="menuPrincipal">
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}" {% if request.endpoint == 'index' %}aria-current="page"{% endif %} href="{{ url_for('index') }}">
+                        <i class="fa-solid fa-house-chimney me-lg-1"></i> Inicio
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.endpoint == 'procedencia' %}active{% endif %}" {% if request.endpoint == 'procedencia' %}aria-current="page"{% endif %} href="{{ url_for('procedencia') }}">
+                        <i class="fa-solid fa-map-location-dot me-lg-1"></i> Procedencia
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.endpoint == 'descriptiva' %}active{% endif %}" {% if request.endpoint == 'descriptiva' %}aria-current="page"{% endif %} href="{{ url_for('descriptiva') }}">
+                        <i class="fa-solid fa-chart-simple me-lg-1"></i> Descriptiva
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.endpoint == 'regresion' %}active{% endif %}" {% if request.endpoint == 'regresion' %}aria-current="page"{% endif %} href="{{ url_for('regresion') }}">
+                        <i class="fa-solid fa-chart-line me-lg-1"></i> Regresión
+                    </a>
+                </li>
+                <li class="nav-item ms-lg-3 d-grid d-lg-block">
+                    <a class="btn btn-sm btn-navy px-3" href="{{ url_for('regresion') }}#simulador">
+                        <i class="fa-solid fa-wand-magic-sparkles me-1"></i> Simulador
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<main id="contenido">
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        <div class="row g-4 py-5">
+            <div class="col-lg-5">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <span class="brand-mark brand-mark-light"><i class="fa-solid fa-compass"></i></span>
+                    <div>
+                        <div class="footer-brand">Observatorio Turístico</div>
+                        <div class="footer-sub">General Pueyrredón · Mar del Plata</div>
+                    </div>
+                </div>
+                <p class="footer-text mb-3">{{ meta.titulo }}. {{ meta.subtitulo }}.</p>
+                <p class="footer-text small mb-0">
+                    <i class="fa-solid fa-location-dot me-2"></i>{{ meta.institucion }} · {{ meta.ciudad }}
+                </p>
+            </div>
+            <div class="col-6 col-lg-3">
+                <h2 class="footer-title">Explorar</h2>
+                <ul class="list-unstyled footer-links">
+                    <li><a href="{{ url_for('index') }}">Inicio</a></li>
+                    <li><a href="{{ url_for('procedencia') }}">Procedencia de visitantes</a></li>
+                    <li><a href="{{ url_for('descriptiva') }}">Estadística descriptiva</a></li>
+                    <li><a href="{{ url_for('regresion') }}">Regresión y predicción</a></li>
+                </ul>
+            </div>
+            <div class="col-6 col-lg-4">
+                <h2 class="footer-title">Ficha académica</h2>
+                <ul class="list-unstyled footer-meta">
+                    <li><i class="fa-solid fa-book-open"></i><span><strong>Espacio curricular:</strong> {{ meta.materia }}</span></li>
+                    <li><i class="fa-solid fa-user-tie"></i><span><strong>Docente titular:</strong> {{ meta.profesora }}</span></li>
+                    <li><i class="fa-solid fa-user-graduate"></i><span><strong>Estudiante:</strong> {{ meta.estudiante }}</span></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <span>© {{ meta.anio }} · Trabajo Práctico Final Integrador de Estadística</span>
+            <span class="footer-tech"><i class="fa-brands fa-python me-1"></i> Flask · SQLite · Bootstrap 5</span>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

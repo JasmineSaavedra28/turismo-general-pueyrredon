@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Error {{ codigo }} · Observatorio Turístico{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div class="container">
+        <span class="hero-badge">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            Error {{ codigo }}
+        </span>
+        <h1>{{ titulo }}</h1>
+        <p class="lead">{{ detalle }}</p>
+        <div class="hero-actions mt-4">
+            <a class="btn btn-navy" href="{{ url_for('index') }}">
+                <i class="fa-solid fa-house-chimney me-1"></i>
+                Volver al inicio
+            </a>
+            <a class="btn btn-soft" href="{{ url_for('descriptiva') }}">
+                <i class="fa-solid fa-chart-simple me-1"></i>
+                Ir al análisis descriptivo
+            </a>
+        </div>
+    </div>
+</div>
+
+<section class="container section-tight">
+    <div class="panel">
+        <div class="panel-head">
+            <div>
+                <h2 class="panel-title">¿Cómo resolverlo?</h2>
+                <p class="panel-sub">Guía rápida para poner en marcha el observatorio.</p>
+            </div>
+            <span class="badge-soft"><i class="fa-solid fa-screwdriver-wrench"></i> Soporte</span>
+        </div>
+        <div class="panel-body">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <h3 class="h6 text-navy mb-2">
+                        <i class="fa-solid fa-database me-1 text-teal"></i>
+                        Verificá la base
+                    </h3>
+                    <p class="source-note mb-2">
+                        El archivo <code>turismo_mdp.db</code> se genera ejecutando los scripts
+                        de ingesta. Si no existe, la aplicación no puede consultar los datos.
+                    </p>
+                    <span class="badge-soft">turismo_mdp.db</span>
+                </div>
+                <div class="col-md-4">
+                    <h3 class="h6 text-navy mb-2">
+                        <i class="fa-solid fa-terminal me-1 text-teal"></i>
+                        Ejecutá el pipeline
+                    </h3>
+                    <p class="source-note mb-2">
+                        Desde la carpeta del proyecto, con el entorno virtual activado:
+                    </p>
+                    <pre class="small mb-0"><code>python cargar_csv.py
+python seed_fasta.py
+python 2_descriptiva.py
+python 3_regresion.py</code></pre>
+                </div>
+                <div class="col-md-4">
+                    <h3 class="h6 text-navy mb-2">
+                        <i class="fa-solid fa-book-open me-1 text-teal"></i>
+                        Consultá el README
+                    </h3>
+                    <p class="source-note mb-2">
+                        El archivo <code>README.md</code> contiene la instalación completa,
+                        las rutas, las fórmulas y la explicación metodológica.
+                    </p>
+                    <span class="badge-soft badge-soft--sand">ISFT N°151 · 2026</span>
+                </div>
+            </div>
+            <div class="divider"></div>
+            <p class="small-muted mb-0">
+                <i class="fa-solid fa-circle-info me-1 text-teal"></i>
+                Si el problema persiste, revisá la consola donde se ejecuta Flask para ver el
+                detalle técnico del error.
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}

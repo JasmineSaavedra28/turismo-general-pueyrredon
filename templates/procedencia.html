@@ -1,0 +1,386 @@
+{% extends "base.html" %}
+
+{% block title %}Procedencia · Observatorio Turístico{% endblock %}
+
+{% block content %}
+{% set anio_ini = resumen.first_year %}
+{% set anio_fin = resumen.latest_year %}
+{% set amba_ini = resumen.shares['AMBA'][anio_ini] + resumen.shares['CABA'][anio_ini] %}
+{% set amba_fin = resumen.participacion_amba %}
+{% set caba_ini = resumen.shares['CABA'][anio_ini] %}
+{% set resto_ini = resumen.shares['Resto Bs As'][anio_ini] %}
+{% set interior_ini = resumen.shares['Interior'][anio_ini] %}
+
+<div class="page-head">
+    <div class="container">
+        <div class="row align-items-end g-3">
+            <div class="col-lg-9">
+                <span class="hero-badge"><i class="fa-solid fa-map-location-dot"></i> Módulo 01 · Datos abiertos municipales</span>
+                <h1>¿De dónde vienen los visitantes?</h1>
+                <p class="lead">
+                    La procedencia geográfica permite entender la estructura de la demanda, el
+                    alcance de los mercados emisores y el impacto diferencial que cada perfil
+                    produce sobre los servicios urbanos de General Pueyrredón.
+                </p>
+            </div>
+            <div class="col-lg-3 text-lg-end">
+                <span class="badge-soft"><i class="fa-regular fa-calendar"></i> {{ anio_ini }} → {{ anio_fin }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="container">
+    <div class="row g-3">
+        <div class="col-6 col-xl-3">
+            <article class="kpi-card kpi-card--sand">
+                <div class="kpi-top">
+                    <span class="kpi-icon kpi-icon--sand"><i class="fa-solid fa-location-dot"></i></span>
+                    <span class="badge-soft badge-soft--sand">{{ anio_fin }}</span>
+                </div>
+                <p class="kpi-label">AMBA + CABA</p>
+                <p class="kpi-value">{{ amba_fin|pct(1) }}</p>
+                <p class="kpi-note">Mercado principal. {{ resumen.variacion_amba|pp(1) }} frente a {{ anio_ini }}.</p>
+            </article>
+        </div>
+        <div class="col-6 col-xl-3">
+            <article class="kpi-card">
+                <div class="kpi-top">
+                    <span class="kpi-icon"><i class="fa-solid fa-city"></i></span>
+                    <span class="badge-soft">{{ anio_fin }}</span>
+                </div>
+                <p class="kpi-label">CABA</p>
+                <p class="kpi-value">{{ resumen.latest['CABA'].share|pct(1) }}</p>
+                <p class="kpi-note">Pasó de {{ caba_ini|pct(1) }} en {{ anio_ini }} a {{ resumen.latest['CABA'].share|pct(1) }}.</p>
+            </article>
+        </div>
+        <div class="col-6 col-xl-3">
+            <article class="kpi-card kpi-card--navy">
+                <div class="kpi-top">
+                    <span class="kpi-icon kpi-icon--navy"><i class="fa-solid fa-road"></i></span>
+                    <span class="badge-soft badge-soft--navy">{{ anio_fin }}</span>
+                </div>
+                <p class="kpi-label">Resto de Buenos Aires</p>
+                <p class="kpi-value">{{ resumen.latest['Resto Bs As'].share|pct(1) }}</p>
+                <p class="kpi-note">Ganó {{ resumen.variacion_resto|pp(1) }} respecto de {{ anio_ini }}.</p>
+            </article>
+        </div>
+        <div class="col-6 col-xl-3">
+            <article class="kpi-card kpi-card--coral">
+                <div class="kpi-top">
+                    <span class="kpi-icon kpi-icon--coral"><i class="fa-solid fa-mountain-sun"></i></span>
+                    <span class="badge-soft badge-soft--coral">{{ anio_fin }}</span>
+                </div>
+                <p class="kpi-label">Interior del país</p>
+                <p class="kpi-value">{{ resumen.latest['Interior'].share|pct(1) }}</p>
+                <p class="kpi-note">Ganó {{ resumen.variacion_interior|pp(1) }} respecto de {{ anio_ini }}.</p>
+            </article>
+        </div>
+    </div>
+</section>
+
+<section class="section-tight">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-xl-8">
+                <div class="panel h-100">
+                    <div class="panel-head">
+                        <div>
+                            <h2 class="panel-title">Evolución de la procedencia</h2>
+                            <p class="panel-sub">Participación porcentual y volumen de visitantes por año.</p>
+                        </div>
+                        <div class="btn-group chart-toggle" role="group" aria-label="Métrica del gráfico">
+                            <button type="button" class="btn btn-sm btn-soft active" data-mode="share">Participación %</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" data-mode="count">Visitantes</button>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="chart-wrap chart-wrap-lg">
+                            <canvas id="chartProcedencia" aria-label="Gráfico de barras agrupadas por origen y año" role="img"></canvas>
+                        </div>
+                    </div>
+                    <div class="panel-foot d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <span class="source-note">
+                            <i class="fa-solid fa-circle-info me-1"></i>
+                            Base de referencia: 100.000 visitantes por año (2023: 99.900 por
+                            redondeo). El gráfico excluye la categoría Exterior para comparar los
+                            cuatro mercados principales.
+                        </span>
+                        <a class="btn btn-soft btn-sm" href="{{ url_for('static', filename='img/procedencia_comparativa.png') }}" download>
+                            <i class="fa-solid fa-download me-1"></i> Descargar gráfico
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4">
+                <div class="panel h-100">
+                    <div class="panel-head">
+                        <div>
+                            <h2 class="panel-title">Lectura rápida</h2>
+                            <p class="panel-sub">Qué cambió entre {{ anio_ini }} y {{ anio_fin }}.</p>
+                        </div>
+                        <span class="badge-soft badge-soft--sand"><i class="fa-solid fa-lightbulb"></i></span>
+                    </div>
+                    <div class="panel-body">
+                        <div class="insight">
+                            <span class="insight-icon"><i class="fa-solid fa-arrow-trend-down"></i></span>
+                            <div>
+                                <h4>El AMBA pierde peso relativo</h4>
+                                <p>
+                                    La suma de GBA y CABA pasó de <strong>{{ amba_ini|pct(1) }}</strong>
+                                    a <strong>{{ amba_fin|pct(1) }}</strong> ({{ resumen.variacion_amba|pp(1) }}).
+                                    Sigue siendo el mercado dominante, pero aparece una demanda más
+                                    diversificada.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="insight">
+                            <span class="insight-icon"><i class="fa-solid fa-building"></i></span>
+                            <div>
+                                <h4>CABA retrocede</h4>
+                                <p>
+                                    La participación de la Ciudad Autónoma de Buenos Aires cayó
+                                    <strong>{{ resumen.variacion_caba|pp(1) }}</strong>, desde
+                                    {{ caba_ini|pct(1) }} hasta {{ resumen.latest['CABA'].share|pct(1) }}.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="insight">
+                            <span class="insight-icon"><i class="fa-solid fa-arrow-trend-up"></i></span>
+                            <div>
+                                <h4>Ganan terreno los mercados regionales</h4>
+                                <p>
+                                    Resto de Buenos Aires creció <strong>{{ resumen.variacion_resto|pp(1) }}</strong>
+                                    y el Interior del país <strong>{{ resumen.variacion_interior|pp(1) }}</strong>.
+                                    Son oportunidades para promoción descentralizada.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="insight">
+                            <span class="insight-icon"><i class="fa-solid fa-chart-simple"></i></span>
+                            <div>
+                                <h4>Una base estable de 100.000 visitantes</h4>
+                                <p>
+                                    La estructura porcentual se conserva sobre una base comparable,
+                                    lo que permite leer tendencias sin confundirlas con cambios en el
+                                    volumen total.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-tight">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="panel">
+                    <div class="panel-head">
+                        <div>
+                            <h2 class="panel-title">Matriz comparativa de origen</h2>
+                            <p class="panel-sub">Cantidad de visitantes y participación porcentual por año.</p>
+                        </div>
+                        <span class="badge-soft"><i class="fa-solid fa-table"></i> Datos consolidados</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-clean align-middle">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Grupo de origen</th>
+                                    {% for anio in resumen.years %}
+                                    <th scope="col" class="num {% if anio == anio_fin %}year-highlight{% endif %}">{{ anio }}</th>
+                                    {% endfor %}
+                                    <th scope="col" class="num">Δ {{ anio_ini }}–{{ anio_fin }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for grupo in resumen.groups %}
+                                <tr>
+                                    <th scope="row" class="fw-semibold text-navy">{{ grupo }}</th>
+                                    {% for anio in resumen.years %}
+                                    <td class="num {% if anio == anio_fin %}year-highlight{% endif %}">
+                                        <div class="fw-semibold">{{ resumen.totals[grupo][anio]|entero }}</div>
+                                        <div class="small-muted">{{ resumen.shares[grupo][anio]|pct(1) }}</div>
+                                    </td>
+                                    {% endfor %}
+                                    <td class="num">
+                                        {% if grupo == 'Exterior' %}
+                                        <span class="small-muted">—</span>
+                                        {% else %}
+                                        <span class="badge-soft {% if resumen.variaciones[grupo] < 0 %}badge-soft--coral{% endif %}">
+                                            {{ resumen.variaciones[grupo]|pp(1) }}
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                <tr class="total-row">
+                                    <td>Total anual</td>
+                                    {% for anio in resumen.years %}
+                                    <td class="num">{{ resumen.year_totals[anio]|entero }}</td>
+                                    {% endfor %}
+                                    <td class="num">—</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="panel-foot">
+                        <i class="fa-solid fa-circle-info me-1 text-teal"></i>
+                        La participación se calcula sobre el total de cada año. En 2023, el 1,3 % de
+                        visitantes extranjeros completa el 100 % y no se incluye en el gráfico de los
+                        cuatro mercados principales.
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="panel h-100">
+                    <div class="panel-head">
+                        <div>
+                            <h2 class="panel-title">Versión para el informe</h2>
+                            <p class="panel-sub">Gráfico de barras agrupadas exportado a PNG.</p>
+                        </div>
+                        <span class="badge-soft badge-soft--navy"><i class="fa-regular fa-image"></i></span>
+                    </div>
+                    <div class="panel-body">
+                        <div class="report-frame">
+                            <img class="img-report"
+                                 src="{{ url_for('static', filename='img/procedencia_comparativa.png') }}"
+                                 alt="Gráfico de barras agrupadas con la procedencia de los visitantes entre 2022 y 2024">
+                        </div>
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-3">
+                            <span class="source-note mb-0">Fuente: Datos Abiertos MGP.</span>
+                            <a class="btn btn-soft btn-sm" href="{{ url_for('static', filename='img/procedencia_comparativa.png') }}" download>
+                                <i class="fa-solid fa-download me-1"></i> PNG
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-tight">
+    <div class="container">
+        <div class="note-box">
+            <div class="d-flex gap-3">
+                <i class="fa-solid fa-database fa-lg mt-1"></i>
+                <div>
+                    <strong class="text-navy">Tratamiento de la fuente.</strong>
+                    Los archivos originales del portal municipal contienen porcentajes mensuales
+                    de procedencia. Para el ETL se calcularon promedios anuales por grupo y se
+                    expresaron sobre una base de referencia de 100.000 visitantes (2023 totaliza
+                    99.900 por redondeo), de modo que las cantidades sean enteras y las
+                    participaciones comparables. Los archivos crudos se conservan en
+                    <code>data/raw/</code> para auditoría.
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+    (() => {
+        const datos = {{ resumen.chart|tojson }};
+        const canvas = document.getElementById('chartProcedencia');
+        if (!canvas || typeof Chart === 'undefined') return;
+
+        const colores = ['#0b2a4a', '#1b8a8f', '#f2c14e'];
+        const formatoNumero = new Intl.NumberFormat('es-AR');
+        let modo = 'share';
+
+        const construirDatasets = (modoActual) => datos.years.map((anio, indice) => ({
+            label: String(anio),
+            data: datos.groups.map((grupo) => modoActual === 'share'
+                ? datos.shares[grupo][indice]
+                : datos.counts[grupo][indice]),
+            backgroundColor: colores[indice % colores.length],
+            borderRadius: 5,
+            borderSkipped: false,
+            maxBarThickness: 46
+        }));
+
+        const chart = new Chart(canvas, {
+            type: 'bar',
+            data: {
+                labels: datos.groups,
+                datasets: construirDatasets(modo)
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            boxWidth: 8,
+                            padding: 16,
+                            font: { family: 'Inter', size: 11 }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: '#0b2a4a',
+                        padding: 11,
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: (context) => {
+                                const valor = context.parsed.y;
+                                const texto = modo === 'share'
+                                    ? `${valor.toFixed(1)} %`
+                                    : `${formatoNumero.format(valor)} visitantes`;
+                                return `${context.dataset.label}: ${texto}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#41556b', font: { family: 'Inter', size: 11, weight: '600' } }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#e8eef4' },
+                        title: {
+                            display: true,
+                            text: 'Participación (%)',
+                            color: '#64748b',
+                            font: { family: 'Inter', size: 10 }
+                        },
+                        ticks: {
+                            color: '#64748b',
+                            callback: (valor) => modo === 'share'
+                                ? `${valor} %`
+                                : formatoNumero.format(valor)
+                        }
+                    }
+                }
+            }
+        });
+
+        document.querySelectorAll('.chart-toggle [data-mode]').forEach((boton) => {
+            boton.addEventListener('click', () => {
+                modo = boton.dataset.mode;
+                chart.data.datasets = construirDatasets(modo);
+                chart.options.scales.y.title.text = modo === 'share' ? 'Participación (%)' : 'Visitantes';
+                chart.update();
+
+                document.querySelectorAll('.chart-toggle [data-mode]').forEach((otro) => {
+                    otro.classList.toggle('active', otro === boton);
+                    otro.classList.toggle('btn-soft', otro === boton);
+                    otro.classList.toggle('btn-outline-secondary', otro !== boton);
+                });
+            });
+        });
+    })();
+</script>
+{% endblock %}

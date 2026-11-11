@@ -1,0 +1,533 @@
+{% extends "base.html" %}
+
+{% block title %}Descriptiva · Observatorio Turístico{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div class="container">
+        <div class="row align-items-end g-3">
+            <div class="col-lg-9">
+                <span class="hero-badge"><i class="fa-solid fa-chart-simple"></i> Módulo 02 · Estadística univariada</span>
+                <h1>La estadía, medida en noches</h1>
+                <p class="lead">
+                    Una submuestra de control de 50 registros permite describir la distribución
+                    de la estadía, su variabilidad y los cuartiles que ordenan la demanda. El
+                    análisis se completa con la tabla de contingencia de planificación y alojamiento.
+                </p>
+            </div>
+            <div class="col-lg-3 text-lg-end">
+                <span class="badge-soft"><i class="fa-solid fa-layer-group"></i> N = {{ desc.n }} · datos agrupados</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="container">
+    <div class="row g-3">
+        <div class="col-6 col-xl-3">
+            <article class="kpi-card">
+                <div class="kpi-top">
+                    <span class="kpi-icon"><i class="fa-solid fa-calculator"></i></span>
+                    <span class="badge-soft">Media</span>
+                </div>
+                <p class="kpi-label">Estadía promedio</p>
+                <p class="kpi-value">{{ desc.media|n(2) }} <span class="kpi-unit">noches</span></p>
+                <p class="kpi-note">Σf·x / N = {{ desc.suma_fx|n(1) }} / {{ desc.n }}.</p>
+            </article>
+        </div>
+        <div class="col-6 col-xl-3">
+            <article class="kpi-card kpi-card--navy">
+                <div class="kpi-top">
+                    <span class="kpi-icon kpi-icon--navy"><i class="fa-solid fa-scale-balanced"></i></span>
+                    <span class="badge-soft badge-soft--navy">Mediana</span>
+                </div>
+                <p class="kpi-label">Valor central</p>
+                <p class="kpi-value">{{ desc.mediana|n(2) }} <span class="kpi-unit">noches</span></p>
+                <p class="kpi-note">El 50 % de los visitantes se queda hasta {{ desc.mediana|n(2) }} noches.</p>
+            </article>
+        </div>
+        <div class="col-6 col-xl-3">
+            <article class="kpi-card kpi-card--sand">
+                <div class="kpi-top">
+                    <span class="kpi-icon kpi-icon--sand"><i class="fa-solid fa-arrows-left-right"></i></span>
+                    <span class="badge-soft badge-soft--sand">Dispersión</span>
+                </div>
+                <p class="kpi-label">Desvío estándar</p>
+                <p class="kpi-value">{{ desc.desvio|n(2) }} <span class="kpi-unit">noches</span></p>
+                <p class="kpi-note">Varianza muestral: {{ desc.varianza|n(2) }} noches².</p>
+            </article>
+        </div>
+        <div class="col-6 col-xl-3">
+            <article class="kpi-card kpi-card--coral">
+                <div class="kpi-top">
+                    <span class="kpi-icon kpi-icon--coral"><i class="fa-solid fa-percent"></i></span>
+                    <span class="badge-soft badge-soft--coral">Variabilidad</span>
+                </div>
+                <p class="kpi-label">Coeficiente de variación</p>
+                <p class="kpi-value">{{ desc.cv|n(2) }}<span class="kpi-unit"> %</span></p>
+                <p class="kpi-note">Al superar el 30 %, la dispersión se considera alta.</p>
+            </article>
+        </div>
+    </div>
+</section>
+
+<section class="section-tight">
+    <div class="container">
+        <div class="panel">
+            <div class="panel-head">
+                <div>
+                    <h2 class="panel-title">Tabla de distribución de frecuencias</h2>
+                    <p class="panel-sub">Estadía en noches · 5 intervalos de amplitud 2 · N = {{ desc.n }}</p>
+                </div>
+                <span class="badge-soft"><i class="fa-solid fa-table-list"></i> Datos agrupados</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-clean align-middle">
+                    <thead>
+                        <tr>
+                            <th scope="col">Intervalo</th>
+                            <th scope="col" class="num">Marca xᵢ</th>
+                            <th scope="col" class="num">fᵢ</th>
+                            <th scope="col" class="num">hᵢ (%)</th>
+                            <th scope="col" class="num">Fᵢ</th>
+                            <th scope="col" class="num">fᵢ·xᵢ</th>
+                            <th scope="col" class="num">fᵢ·xᵢ²</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for fila in desc.tabla %}
+                        <tr {% if fila.f == desc.conteos|max %}class="fw-semibold"{% endif %}>
+                            <th scope="row" class="fw-semibold text-navy">{{ fila.intervalo }}</th>
+                            <td class="num">{{ fila.marca|n(1) }}</td>
+                            <td class="num">{{ fila.f }}</td>
+                            <td class="num">{{ fila.h_pct|n(1) }}</td>
+                            <td class="num">{{ fila.F }}</td>
+                            <td class="num">{{ fila.fx|n(1) }}</td>
+                            <td class="num">{{ fila.fx2|n(1) }}</td>
+                        </tr>
+                        {% endfor %}
+                        <tr class="total-row">
+                            <td>Total</td>
+                            <td class="num">—</td>
+                            <td class="num">{{ desc.n }}</td>
+                            <td class="num">100,0</td>
+                            <td class="num">—</td>
+                            <td class="num">{{ desc.suma_fx|n(1) }}</td>
+                            <td class="num">{{ desc.suma_fx2|n(1) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="panel-foot">
+                <i class="fa-solid fa-circle-info me-1 text-teal"></i>
+                La clase modal es {{ desc.clase_modal }} (marca {{ desc.moda|n(1) }}), con la mayor
+                frecuencia absoluta. Los cálculos de mediana y cuartiles se realizan por interpolación
+                lineal dentro del intervalo.
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-tight">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="panel h-100">
+                    <div class="panel-head">
+                        <div>
+                            <h2 class="panel-title">Box-plot de la estadía</h2>
+                            <p class="panel-sub">Distribución, cuartiles, media y valores extremos de la submuestra.</p>
+                        </div>
+                        <a class="btn btn-soft btn-sm" href="{{ url_for('static', filename='img/boxplot_estadia.png') }}" download>
+                            <i class="fa-solid fa-download me-1"></i> PNG
+                        </a>
+                    </div>
+                    <div class="panel-body">
+                        <div class="report-frame">
+                            <img class="img-report"
+                                 src="{{ url_for('static', filename='img/boxplot_estadia.png') }}"
+                                 alt="Box-plot de la estadía en noches con cuartiles y media para la submuestra de 50 registros">
+                        </div>
+                        <div class="d-flex flex-wrap gap-2 mt-3">
+                            <span class="badge-soft">Q1 = {{ desc.q1|n(2) }}</span>
+                            <span class="badge-soft badge-soft--sand">Me = {{ desc.q2|n(2) }}</span>
+                            <span class="badge-soft">Q3 = {{ desc.q3|n(2) }}</span>
+                            <span class="badge-soft badge-soft--coral">IQR = {{ desc.iqr|n(2) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="panel h-100">
+                    <div class="panel-head">
+                        <div>
+                            <h2 class="panel-title">Síntesis de medidas</h2>
+                            <p class="panel-sub">Tendencia central, dispersión y posición.</p>
+                        </div>
+                        <span class="badge-soft badge-soft--navy"><i class="fa-solid fa-ruler-combined"></i></span>
+                    </div>
+                    <div class="panel-body">
+                        <div class="metric-grid">
+                            <div class="metric-tile">
+                                <div class="label">Media</div>
+                                <div class="value">{{ desc.media|n(2) }}</div>
+                                <div class="hint">noches</div>
+                            </div>
+                            <div class="metric-tile">
+                                <div class="label">Mediana</div>
+                                <div class="value">{{ desc.mediana|n(2) }}</div>
+                                <div class="hint">Q2</div>
+                            </div>
+                            <div class="metric-tile">
+                                <div class="label">Moda</div>
+                                <div class="value">{{ desc.moda|n(1) }}</div>
+                                <div class="hint">clase {{ desc.clase_modal }}</div>
+                            </div>
+                            <div class="metric-tile">
+                                <div class="label">Varianza</div>
+                                <div class="value">{{ desc.varianza|n(2) }}</div>
+                                <div class="hint">noches²</div>
+                            </div>
+                            <div class="metric-tile">
+                                <div class="label">Desvío</div>
+                                <div class="value">{{ desc.desvio|n(2) }}</div>
+                                <div class="hint">noches</div>
+                            </div>
+                            <div class="metric-tile">
+                                <div class="label">CV</div>
+                                <div class="value">{{ desc.cv|n(2) }} %</div>
+                                <div class="hint">alta dispersión</div>
+                            </div>
+                            <div class="metric-tile">
+                                <div class="label">Q1</div>
+                                <div class="value">{{ desc.q1|n(2) }}</div>
+                                <div class="hint">25 %</div>
+                            </div>
+                            <div class="metric-tile">
+                                <div class="label">Q3</div>
+                                <div class="value">{{ desc.q3|n(2) }}</div>
+                                <div class="hint">75 %</div>
+                            </div>
+                        </div>
+                        <div class="note-box mt-3">
+                            <i class="fa-solid fa-circle-info me-1"></i>
+                            <strong>Lectura:</strong> como la media ({{ desc.media|n(2) }}) supera levemente
+                            a la mediana ({{ desc.mediana|n(2) }}), la distribución presenta un sesgo
+                            positivo. El IQR de {{ desc.iqr|n(2) }} noches concentra al 50 % central de
+                            los visitantes.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="row align-items-end g-3 mb-4">
+            <div class="col-lg-8">
+                <span class="eyebrow">Módulo de probabilidades</span>
+                <h2 class="section-title">Planificación y alojamiento</h2>
+                <p class="section-lead">
+                    La tabla de contingencia cruza la anticipación de la reserva con el tipo de
+                    alojamiento. Permite estimar probabilidades conjuntas y condicionadas para
+                    diseñar promociones y servicios digitales.
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <span class="badge-soft badge-soft--sand"><i class="fa-solid fa-dice"></i> N = {{ prob.n }}</span>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-5">
+                <div class="panel h-100">
+                    <div class="panel-head">
+                        <div>
+                            <h2 class="panel-title">Tabla de contingencia</h2>
+                            <p class="panel-sub">A: reserva con menos de 7 días · B: alquiler de depto./casa.</p>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-clean align-middle">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Planificación</th>
+                                    <th scope="col" class="num">B: alquila</th>
+                                    <th scope="col" class="num">B′: hotel/propio</th>
+                                    <th scope="col" class="num">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row" class="fw-semibold text-navy">A: repentino</th>
+                                    <td class="num">{{ prob.n11 }}</td>
+                                    <td class="num">{{ prob.n10 }}</td>
+                                    <td class="num fw-semibold">{{ prob.n_a }}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" class="fw-semibold text-navy">A′: planificado</th>
+                                    <td class="num">{{ prob.n01 }}</td>
+                                    <td class="num">{{ prob.n00 }}</td>
+                                    <td class="num fw-semibold">{{ prob.n - prob.n_a }}</td>
+                                </tr>
+                                <tr class="total-row">
+                                    <td>Total</td>
+                                    <td class="num">{{ prob.n_b }}</td>
+                                    <td class="num">{{ prob.n - prob.n_b }}</td>
+                                    <td class="num">{{ prob.n }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="panel-foot">
+                        <i class="fa-solid fa-circle-info me-1 text-teal"></i>
+                        La categoría B′ agrupa hotelería y alojamiento propio. Las frecuencias son
+                        consistentes con el perfil categórico del informe.
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <article class="kpi-card kpi-card--navy h-100">
+                            <p class="kpi-label">P(A) · turista repentino</p>
+                            <p class="kpi-value">{{ prob.p_a_pct|n(1) }}<span class="kpi-unit"> %</span></p>
+                            <p class="kpi-note">{{ prob.n_a }} de {{ prob.n }} reservas se hicieron con menos de 7 días.</p>
+                        </article>
+                    </div>
+                    <div class="col-6">
+                        <article class="kpi-card kpi-card--sand h-100">
+                            <p class="kpi-label">P(B) · alquila depto./casa</p>
+                            <p class="kpi-value">{{ prob.p_b_pct|n(1) }}<span class="kpi-unit"> %</span></p>
+                            <p class="kpi-note">{{ prob.n_b }} de {{ prob.n }} turistas eligen alojamiento extrahotelero.</p>
+                        </article>
+                    </div>
+                    <div class="col-6">
+                        <article class="kpi-card h-100">
+                            <p class="kpi-label">P(A ∩ B) · conjunta</p>
+                            <p class="kpi-value">{{ prob.p_interseccion_pct|n(1) }}<span class="kpi-unit"> %</span></p>
+                            <p class="kpi-note">{{ prob.n11 }} turistas son repentinos y además alquilan depto./casa.</p>
+                        </article>
+                    </div>
+                    <div class="col-6">
+                        <article class="kpi-card kpi-card--coral h-100">
+                            <p class="kpi-label">P(B | A) · condicionada</p>
+                            <p class="kpi-value">{{ prob.p_b_dado_a_pct|n(1) }}<span class="kpi-unit"> %</span></p>
+                            <p class="kpi-note">{{ prob.n11 }} / {{ prob.n_a }}. La reserva de último momento se asocia al alquiler.</p>
+                        </article>
+                    </div>
+                    <div class="col-12">
+                        <div class="note-box">
+                            <i class="fa-solid fa-lightbulb me-1"></i>
+                            <strong>Interpretación socio-técnica:</strong> el
+                            {{ prob.p_b_dado_a_pct|n(1) }} % de los turistas que deciden a último
+                            momento elige departamentos o casas de alquiler. Esto justifica mapas de
+                            disponibilidad en tiempo real y promociones digitales de corta duración.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-tight">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="panel h-100">
+                    <div class="panel-head">
+                        <div>
+                            <h2 class="panel-title">Distribución del alojamiento</h2>
+                            <p class="panel-sub">Participación sobre el total de la muestra.</p>
+                        </div>
+                        <span class="kpi-icon kpi-icon--sand"><i class="fa-solid fa-bed"></i></span>
+                    </div>
+                    <div class="panel-body">
+                        <div class="chart-wrap-sm">
+                            <canvas id="chartAlojamiento" aria-label="Distribución porcentual del tipo de alojamiento" role="img"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="panel h-100">
+                    <div class="panel-head">
+                        <div>
+                            <h2 class="panel-title">Distribución del transporte</h2>
+                            <p class="panel-sub">Medio utilizado para arribar a la ciudad.</p>
+                        </div>
+                        <span class="kpi-icon"><i class="fa-solid fa-car-side"></i></span>
+                    </div>
+                    <div class="panel-body">
+                        <div class="chart-wrap-sm">
+                            <canvas id="chartTransporte" aria-label="Distribución porcentual del medio de transporte" role="img"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-tight">
+    <div class="container">
+        <div class="panel">
+            <div class="panel-head">
+                <div>
+                    <h2 class="panel-title">Fórmulas aplicadas</h2>
+                    <p class="panel-sub">Desarrollo analítico de las medidas y probabilidades del módulo.</p>
+                </div>
+                <span class="badge-soft badge-soft--navy"><i class="fa-solid fa-square-root-variable"></i> LaTeX</span>
+            </div>
+            <div class="panel-body">
+                <div class="accordion" id="acordeonFormulas">
+                    <div class="accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#formulaMedia" aria-expanded="true" aria-controls="formulaMedia">
+                                Media, mediana y varianza con datos agrupados
+                            </button>
+                        </h3>
+                        <div id="formulaMedia" class="accordion-collapse collapse show" data-bs-parent="#acordeonFormulas">
+                            <div class="accordion-body">
+                                <div class="formula mb-2">
+                                    \[
+                                    \bar{x} = \frac{\sum_{i=1}^{m} f_i x_i}{N}
+                                    \qquad
+                                    s^2 = \frac{\sum f_i x_i^2 - \frac{(\sum f_i x_i)^2}{N}}{N-1}
+                                    \]
+                                </div>
+                                <p class="mb-0">
+                                    Con \(N = 50\), \(\sum f_i x_i = 280\) y \(\sum f_i x_i^2 = 1.808\),
+                                    se obtiene \(\bar{x} = 5{,}60\) y \(s^2 = 4{,}898\).
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#formulaCuartiles" aria-expanded="false" aria-controls="formulaCuartiles">
+                                Cuartiles, mediana e IQR por interpolación
+                            </button>
+                        </h3>
+                        <div id="formulaCuartiles" class="accordion-collapse collapse" data-bs-parent="#acordeonFormulas">
+                            <div class="accordion-body">
+                                <div class="formula mb-2">
+                                    \[
+                                    Q_k = L_{i-1} + \left(\frac{kN/4 - F_{i-1}}{f_i}\right) \cdot C
+                                    \qquad
+                                    IQR = Q_3 - Q_1
+                                    \]
+                                </div>
+                                <p class="mb-0">
+                                    \(Q_1 = 3{,}93\), \(Q_2 = 5{,}56\), \(Q_3 = 6{,}94\) y
+                                    \(IQR = 3{,}01\) noches.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#formulaProb" aria-expanded="false" aria-controls="formulaProb">
+                                Probabilidad conjunta y condicionada
+                            </button>
+                        </h3>
+                        <div id="formulaProb" class="accordion-collapse collapse" data-bs-parent="#acordeonFormulas">
+                            <div class="accordion-body">
+                                <div class="formula mb-2">
+                                    \[
+                                    P(A \cap B) = \frac{n_{AB}}{N}
+                                    \qquad
+                                    P(B \mid A) = \frac{P(A \cap B)}{P(A)}
+                                    \]
+                                </div>
+                                <p class="mb-0">
+                                    \(P(A \cap B) = 15/100 = 0{,}15\) y
+                                    \(P(B \mid A) = 0{,}15 / 0{,}17 = 0{,}8824\).
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="source-note mt-3">
+                    <i class="fa-solid fa-circle-info me-1"></i>
+                    Los cálculos se realizan sobre la submuestra de control de 50 registros para
+                    las medidas descriptivas y sobre los 100 microdatos para la tabla de
+                    contingencia.
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+    (() => {
+        const alojamiento = {{ distribuciones.alojamiento|tojson }};
+        const transporte = {{ distribuciones.transporte|tojson }};
+        const colores = ['#0b2a4a', '#1b8a8f', '#f2c14e', '#e76f51'];
+        const formato = new Intl.NumberFormat('es-AR', { maximumFractionDigits: 1 });
+
+        const opciones = (etiqueta) => ({
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '64%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        boxWidth: 8,
+                        padding: 14,
+                        font: { family: 'Inter', size: 11 }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: '#0b2a4a',
+                    padding: 10,
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: (context) => {
+                            const valor = context.parsed;
+                            return ` ${context.label}: ${formato.format(valor)} %`;
+                        }
+                    }
+                }
+            }
+        });
+
+        const crearDona = (id, datos, titulo) => {
+            const canvas = document.getElementById(id);
+            if (!canvas || typeof Chart === 'undefined') return;
+            new Chart(canvas, {
+                type: 'doughnut',
+                data: {
+                    labels: datos.map((item) => item.label),
+                    datasets: [{
+                        data: datos.map((item) => item.pct),
+                        backgroundColor: datos.map((_, indice) => colores[indice % colores.length]),
+                        borderColor: '#ffffff',
+                        borderWidth: 3,
+                        hoverOffset: 5
+                    }]
+                },
+                options: opciones(titulo)
+            });
+        };
+
+        crearDona('chartAlojamiento', alojamiento, 'Alojamiento');
+        crearDona('chartTransporte', transporte, 'Transporte');
+    })();
+</script>
+<script>
+    window.MathJax = {
+        tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+        svg: { fontCache: 'global' }
+    };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+{% endblock %}
