@@ -5,6 +5,8 @@
 > **Trabajo Práctico Final Integrador · Estadística · Ciclo Lectivo 2026**  
 > Observatorio Turístico de General Pueyrredón · Mar del Plata, Argentina
 
+> **🌐 Aplicación en vivo:** [turismo-general-pueyrredon.onrender.com](https://turismo-general-pueyrredon.onrender.com)
+
 | Ficha académica | |
 | :--- | :--- |
 | **Institución** | Instituto Superior de Formación Técnica N°151 (ISFT N°151) |
@@ -16,6 +18,7 @@
 | **Ciclo lectivo** | 2026 |
 | **Entrega** | Noviembre de 2026 |
 
+[![Demo en vivo](https://img.shields.io/badge/demo-en_vivo-1b8a8f)](https://turismo-general-pueyrredon.onrender.com)
 ![Python](https://img.shields.io/badge/Python-3.12%2B-0b2a4a?logo=python&logoColor=f2c14e)
 ![Flask](https://img.shields.io/badge/Flask-3.1-0b2a4a?logo=flask&logoColor=white)
 ![SQLite](https://img.shields.io/badge/SQLite-3-1b8a8f?logo=sqlite&logoColor=white)
@@ -56,6 +59,8 @@ La aplicación transforma datos abiertos municipales y microdatos calibrados del
 - **Regresión:** covarianza, correlación de Pearson, recta de mínimos cuadrados y simulador predictivo de noches de estadía.
 
 Además, expone una **API interna** `POST /predict` que devuelve la estadía estimada para una cantidad de días de anticipación.
+
+La versión pública del tablero está disponible en **[turismo-general-pueyrredon.onrender.com](https://turismo-general-pueyrredon.onrender.com)**.
 
 ---
 
@@ -639,20 +644,26 @@ Cada `push` a la rama `main` actualiza el repositorio y, si está activada la op
 
 ## 13. Publicación en línea (Render)
 
+La aplicación está publicada y funcionando en:
+
+**https://turismo-general-pueyrredon.onrender.com**
+
+| Recurso | Enlace |
+|---|---|
+| Aplicación en vivo | https://turismo-general-pueyrredon.onrender.com |
+| Repositorio | https://github.com/JasmineSaavedra28/turismo-general-pueyrredon |
+| Plataforma | Render · plan Free |
+
 Render permite publicar la aplicación Flask de forma gratuita y conectada a GitHub, para que la profesora acceda desde un enlace sin depender de tu computadora.
 
-### Pasos
+### Pasos de despliegue (referencia)
 
 1. Crear una cuenta en [render.com](https://render.com) usando la cuenta de GitHub.
 2. Entrar a **New + → Blueprint**.
 3. Seleccionar el repositorio **`JasmineSaavedra28/turismo-general-pueyrredon`**.
 4. Render detecta el archivo `render.yaml` y propone el servicio con su build y start command.
 5. Confirmar con **Apply** y esperar a que termine el build.
-6. Copiar la URL pública, con un formato similar a:
-
-```text
-https://turismo-general-pueyrredon.onrender.com
-```
+6. Render asigna la URL pública; en este proyecto quedó como se indica arriba.
 
 También se puede crear como **New + → Web Service**, eligiendo el repositorio y usando:
 
