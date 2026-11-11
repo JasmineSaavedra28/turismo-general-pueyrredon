@@ -613,14 +613,6 @@ Si el repositorio remoto ya existe y tiene otro historial:
 git branch -M main
 git push -u origin main --force-with-lease
 ```
-
-Antes de publicar, verificar que:
-
-- `static/img/` contiene los tres PNG.
-- `data/raw/` conserva los archivos originales.
-- `db/turismo_mdp.db` y `.venv/` no están versionados.
-- El README muestra la ficha académica correcta.
-
 ---
 
 ## 13. Referencias
