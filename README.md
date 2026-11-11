@@ -454,34 +454,42 @@ La API valida que el valor sea numérico, finito, no negativo y menor o igual a 
 
 ### Requisitos
 
-- Python 3.11 o superior.
+- Python 3.11 o superior. En Windows, instalarlo desde [python.org](https://www.python.org/downloads/windows/) y marcar la opción **“Add python.exe to PATH”** durante la instalación.
 - Git (opcional, para clonar el repositorio).
 - Conexión a Internet para cargar Bootstrap, FontAwesome, Chart.js y MathJax desde CDN.
 
+> Todos los comandos se ejecutan desde la **raíz del proyecto**, es decir, la carpeta que contiene `app.py`.
+
 ### Windows (PowerShell)
+
+La forma más robusta es llamar directamente al Python del entorno virtual. Así no depende de que el entorno esté activado ni del alias de Microsoft Store:
 
 ```powershell
 git clone https://github.com/<usuario>/<repositorio>.git
 cd turismo
 
+# Solo la primera vez: crear el entorno e instalar dependencias
 py -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m pip install --upgrade pip
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
 
-py scripts/cargar_csv.py
-py scripts/seed_fasta.py
-py scripts/2_descriptiva.py
-py scripts/3_regresion.py
-
-py app.py
+# Pipeline de datos y servidor
+.\.venv\Scripts\python.exe scripts\cargar_csv.py
+.\.venv\Scripts\python.exe scripts\seed_fasta.py
+.\.venv\Scripts\python.exe scripts\2_descriptiva.py
+.\.venv\Scripts\python.exe scripts\3_regresion.py
+.\.venv\Scripts\python.exe app.py
 ```
 
-Si PowerShell bloquea la activación del entorno virtual:
+También podés activar el entorno y usar `python` normalmente:
 
 ```powershell
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 .\.venv\Scripts\Activate.ps1
+python app.py
 ```
+
+> `Set-ExecutionPolicy -Scope Process` solo afecta a esa ventana de PowerShell y evita el error de “la ejecución de scripts está deshabilitada”.
 
 ### macOS / Linux
 
@@ -491,15 +499,27 @@ cd turismo
 
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 
-python3 scripts/cargar_csv.py
-python3 scripts/seed_fasta.py
-python3 scripts/2_descriptiva.py
-python3 scripts/3_regresion.py
+python scripts/cargar_csv.py
+python scripts/seed_fasta.py
+python scripts/2_descriptiva.py
+python scripts/3_regresion.py
 
-python3 app.py
+python app.py
 ```
+
+> `source .venv/bin/activate` es exclusivo de macOS, Linux y Git Bash. **En PowerShell no existe**: se usa `.\.venv\Scripts\Activate.ps1`.
+
+### Errores frecuentes en Windows
+
+| Síntoma | Causa | Solución |
+|---|---|---|
+| `python` abre la Microsoft Store | Windows redirige al alias de la Store porque el entorno virtual no está activo | Usar `.\.venv\Scripts\python.exe` o `py` |
+| `source` no se reconoce | Es un comando de macOS/Linux, no de PowerShell | Usar `.\.venv\Scripts\Activate.ps1` |
+| No se puede cargar `Activate.ps1` por la política de ejecución | PowerShell bloquea scripts | `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass` |
+| `py` no se reconoce | No está instalado el lanzador de Python | Reinstalar Python desde python.org o usar `.\.venv\Scripts\python.exe` |
+| `ModuleNotFoundError: No module named 'flask'` | Las dependencias se instalaron fuera del entorno | `.\.venv\Scripts\python.exe -m pip install -r requirements.txt` |
 
 Abrir en el navegador: **http://127.0.0.1:5000**
 
